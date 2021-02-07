@@ -104,10 +104,10 @@ int save_pack(const char *path)
                                  &effect, &effect_params);
 
                 uint8_t flags = 0;
-                if (note != -1)
-                    flags |= STEP_HAS_NOTE;
                 if (instrument != -1)
                     flags |= STEP_HAS_INSTRUMENT;
+                if (note != -1)
+                    flags |= STEP_HAS_NOTE;
                 if (volume != -1)
                     flags |= STEP_HAS_VOLUME;
                 if (effect != -1)
@@ -115,14 +115,14 @@ int save_pack(const char *path)
 
                 fwrite(&flags, sizeof(flags), 1, f);
 
-                if (note != -1)
-                {
-                    value = note;
-                    fwrite(&value, sizeof(value), 1, f);
-                }
                 if (instrument != -1)
                 {
                     value = instrument;
+                    fwrite(&value, sizeof(value), 1, f);
+                }
+                if (note != -1)
+                {
+                    value = note;
                     fwrite(&value, sizeof(value), 1, f);
                 }
                 if (volume != -1)

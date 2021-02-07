@@ -39,8 +39,8 @@ typedef struct {
 
 // Pattern step flags
 
-#define STEP_HAS_NOTE           (1 << 0)
-#define STEP_HAS_INSTRUMENT     (1 << 1)
+#define STEP_HAS_INSTRUMENT     (1 << 0)
+#define STEP_HAS_NOTE           (1 << 1)
 #define STEP_HAS_VOLUME         (1 << 2)
 #define STEP_HAS_EFFECT         (1 << 3)
 

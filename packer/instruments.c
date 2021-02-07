@@ -131,3 +131,15 @@ int instrument_get(int instrument_index, int8_t **data, size_t *size,
 
     return 0;
 }
+
+int instrument_get_volume(int instrument_index, int *volume)
+{
+    if (instrument_index >= instruments_used)
+        return -1;
+
+    generic_instrument *instrument = instruments[instrument_index];
+
+    *volume = instrument->volume;
+
+    return 0;
+}

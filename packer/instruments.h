@@ -18,4 +18,6 @@ int instrument_get(int instrument_index, int8_t **data, size_t *size,
                    int *volume, int *finetune,
                    size_t *loop_start, size_t *loop_length);
 
+int instrument_get_volume(int instrument_index, int *volume);
+
 #endif // INSTRUMENTS_H__

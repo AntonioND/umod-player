@@ -415,7 +415,17 @@ int add_mod(const char *path)
 
                 int instrument = -1;
                 if (instrument_number > 0)
+                {
                     instrument = instrument_index[instrument_number - 1];
+
+                    if (volume == -1)
+                    {
+                        // If there is an instrument, but no volume command, set
+                        // the volume to the default instrument volume.
+
+                        instrument_get_volume(instrument, &volume);
+                    }
+                }
 
                 pattern_step_set(pattern_index[i], r, c,
                                  note, instrument, volume,

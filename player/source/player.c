@@ -164,15 +164,6 @@ static void *InstrumentGetPointer(int index)
     return (void *)instrument_address;
 }
 
-static int InstrumentGetDefaultVolume(int index)
-{
-    umodpack_instrument *instrument = InstrumentGetPointer(index);
-
-    uint8_t volume = instrument->volume;
-
-    return volume;
-}
-
 static int SeekRow(int row)
 {
     loaded_song.current_row = row;
@@ -235,13 +226,6 @@ static void UMOD_Tick(void)
     {
         uint8_t flags = *loaded_song.pattern_position++;
 
-        if (flags & STEP_HAS_NOTE)
-        {
-            uint8_t note = *loaded_song.pattern_position++;
-            //printf("N: %u ", note);
-            ModChannelSetNote(c, note);
-        }
-
         if (flags & STEP_HAS_INSTRUMENT)
         {
             uint8_t instrument = *loaded_song.pattern_position++;
@@ -249,13 +233,13 @@ static void UMOD_Tick(void)
 
             void *instrument_pointer = InstrumentGetPointer(instrument);
             ModChannelSetInstrument(c, instrument_pointer);
+        }
 
-            if ((flags & STEP_HAS_VOLUME) == 0)
-            {
-                // Get default volume for this instrument
-                int volume = InstrumentGetDefaultVolume(instrument);
-                ModChannelSetVolume(c, volume);
-            }
+        if (flags & STEP_HAS_NOTE)
+        {
+            uint8_t note = *loaded_song.pattern_position++;
+            //printf("N: %u ", note);
+            ModChannelSetNote(c, note);
         }
 
         if (flags & STEP_HAS_VOLUME)

@@ -15,6 +15,9 @@
 #include "patterns.h"
 #include "song.h"
 
+// The UMOD pack format has volume from 0 to 255, MOD only reaches 64.
+#define MOD_VOLUME_SCALE    (256 / 64)
+
 // MOD format constants
 
 #define MOD_ROWS    64 // Rows per pattern
@@ -233,7 +236,7 @@ int add_mod(const char *path)
         if (instrument_size > 0)
         {
             // TODO: This is logarithmic
-            int volume = instrument->volume * 4;
+            int volume = instrument->volume * MOD_VOLUME_SCALE;
             if (volume > 255)
                 volume = 255;
 
@@ -315,10 +318,26 @@ int add_mod(const char *path)
                         break;
                     }
                     case 0x9: // Sample Offset
-                    case 0xA: // Volume slide
                         printf("Effect not supported: %02X%02X\n",
                                effect_number, effect_params);
                         break;
+                    case 0xA: // Volume slide
+                    {
+                        int dec = effect_params & 0xF;
+                        int inc = effect_params >> 4;
+
+                        // If both are set, ignore effect
+                        if ((dec > 0) && (inc > 0))
+                            break;
+
+                        converted_effect = EFFECT_VOLUME_SLIDE;
+                        if (inc > 0)
+                            converted_effect_param = inc * MOD_VOLUME_SCALE;
+                        if (dec > 0)
+                            converted_effect_param = -dec * MOD_VOLUME_SCALE;
+
+                        break;
+                    }
                     case 0xB: // Jump to pattern
                     {
                         if (effect_params > max_pattern_index)
@@ -330,7 +349,7 @@ int add_mod(const char *path)
                     }
                     case 0xC: // Set volume
                     {
-                        volume = effect_params * 4;
+                        volume = effect_params * MOD_VOLUME_SCALE;
                         if (volume > 255)
                             volume = 255;
                         break;

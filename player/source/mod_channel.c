@@ -241,6 +241,25 @@ void ModChannelUpdateAllTick(int tick_number)
             uint64_t period = ModGetSampleTickPeriod(note, 0);
             MixerChannelSetNotePeriod(ch->mixer_channel_handle, period);
         }
+        else if (ch->effect == EFFECT_VOLUME_SLIDE)
+        {
+            if (tick_number > 0)
+            {
+                int volume = ch->volume + (int8_t)ch->effect_params;
+
+                if (volume > 255)
+                    volume = 255;
+
+                if (volume < 0)
+                    volume = 0;
+
+                if (volume != ch->volume)
+                {
+                    ch->volume = volume;
+                    MixerChannelSetVolume(handle, volume);
+                }
+            }
+        }
 
         // TODO : Other effects
     }

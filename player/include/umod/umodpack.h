@@ -58,5 +58,6 @@ typedef struct {
 #define EFFECT_PATTERN_BREAK    4
 #define EFFECT_JUMP_TO_PATTERN  5
 #define EFFECT_ARPEGGIO         6
+#define EFFECT_VOLUME_SLIDE     7
 
 #endif // UMOD_UMODPACK_H__

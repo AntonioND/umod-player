@@ -221,6 +221,7 @@ static void UMOD_Tick(void)
     int jump_to_pattern = -1;
 
     //printf("%d/%d : ", loaded_song.current_row, loaded_song.pattern_rows);
+    //setvbuf(stdout, 0, _IONBF, 0);
 
     for (int c = 0; c < loaded_song.pattern_channels; c++)
     {
@@ -255,7 +256,8 @@ static void UMOD_Tick(void)
 
         if (note != -1)
         {
-            ModChannelSetNote(c, note);
+            if (effect != EFFECT_PORTA_TO_NOTE)
+                ModChannelSetNote(c, note);
         }
 
         if (volume != -1)
@@ -265,7 +267,7 @@ static void UMOD_Tick(void)
 
         if (effect == -1)
         {
-            ModChannelSetEffect(c, EFFECT_NONE, 0);
+            ModChannelSetEffect(c, EFFECT_NONE, 0, 0);
         }
         else
         {
@@ -296,7 +298,7 @@ static void UMOD_Tick(void)
             }
             else
             {
-                ModChannelSetEffect(c, effect, effect_params);
+                ModChannelSetEffect(c, effect, effect_params, note);
             }
         }
     }

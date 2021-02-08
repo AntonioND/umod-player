@@ -151,6 +151,9 @@ int MixerChannelSetNotePeriod(uint32_t handle, uint64_t period) // 48.16
 
     mixer_channel_info *ch = &mixer_channel[channel];
 
+    if (period == 0)
+        period = 1;
+
     ch->sample.position = 0;
     ch->sample.elapsed_ticks = 0;
     ch->sample.period = period;

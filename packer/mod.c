@@ -312,10 +312,12 @@ int add_mod(const char *path)
                         converted_effect_param = effect_params;
                         break;
                     }
-                    case 0x7: // Tremolo
-                        printf("Effect not supported: %X%02X\n",
-                               effect_number, effect_params);
+                    case 0x3: // Porta to note
+                    {
+                        converted_effect = EFFECT_PORTA_TO_NOTE;
+                        converted_effect_param = effect_params;
                         break;
+                    }
                     case 0x8: // Pan
                     {
                         // 0x00 = left, 0xFF = right
@@ -461,10 +463,10 @@ int add_mod(const char *path)
                         converted_effect_param = effect_params;
                         break;
                     }
-                    case 0x3: // Porta to note
                     case 0x4: // Vibrato
                     case 0x5: // Porta + Volume slide
                     case 0x6: // Vibrato + Volume slide
+                    case 0x7: // Tremolo
                     default:
                         printf("Effect not supported: %X%02X\n",
                                effect_number, effect_params);

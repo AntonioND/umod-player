@@ -28,6 +28,9 @@ typedef struct {
 
     int         arpeggio_tick;
 
+    int32_t     porta_to_note_target_amiga_period;
+    int         porta_to_note_speed;
+
     uint32_t    sample_offset; // Used for "Set Offset" effect
 
     uint32_t    mixer_channel_handle;
@@ -260,7 +263,7 @@ void ModChannelSetInstrument(int channel, void *instrument_pointer)
     }
 }
 
-void ModChannelSetEffect(int channel, int effect, int effect_params)
+void ModChannelSetEffect(int channel, int effect, int effect_params, int note)
 {
     assert(channel < MOD_CHANNELS_MAX);
 
@@ -298,6 +301,16 @@ void ModChannelSetEffect(int channel, int effect, int effect_params)
     else if (effect == EFFECT_ARPEGGIO)
     {
         mod_ch->arpeggio_tick = 0;
+    }
+    else if (effect == EFFECT_PORTA_TO_NOTE)
+    {
+        if (effect_params != 0)
+        {
+            uint32_t amiga_period = ModNoteToAmigaPeriod(note, 0);
+
+            mod_ch->porta_to_note_target_amiga_period = amiga_period;
+            mod_ch->porta_to_note_speed = effect_params;
+        }
     }
 
     // TODO
@@ -452,6 +465,32 @@ void ModChannelUpdateAllTick(int tick_number)
                 }
 
                 MixerChannelSetSampleOffset(handle, offset);
+            }
+        }
+        else if (ch->effect == EFFECT_PORTA_TO_NOTE)
+        {
+            if (tick_number != 0)
+            {
+                int32_t target = ch->porta_to_note_target_amiga_period;
+
+                if (target > ch->amiga_period)
+                {
+                    ch->amiga_period += ch->porta_to_note_speed;
+                    if (target < ch->amiga_period)
+                        ch->amiga_period = target;
+
+                    uint64_t period = ModGetSampleTickPeriodFromAmigaPeriod(ch->amiga_period);
+                    MixerChannelSetNotePeriod(ch->mixer_channel_handle, period);
+                }
+                else if (target < ch->amiga_period)
+                {
+                    ch->amiga_period -= ch->porta_to_note_speed;
+                    if (target > ch->amiga_period)
+                        ch->amiga_period = target;
+
+                    uint64_t period = ModGetSampleTickPeriodFromAmigaPeriod(ch->amiga_period);
+                    MixerChannelSetNotePeriod(ch->mixer_channel_handle, period);
+                }
             }
         }
 

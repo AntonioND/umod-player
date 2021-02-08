@@ -51,17 +51,18 @@ typedef struct {
 
 // Effect types
 
-#define EFFECT_NONE             0
-#define EFFECT_SET_SPEED        1
-#define EFFECT_SET_PANNING      2
-#define EFFECT_CUT_NOTE         3
-#define EFFECT_PATTERN_BREAK    4
-#define EFFECT_JUMP_TO_PATTERN  5
-#define EFFECT_ARPEGGIO         6
-#define EFFECT_VOLUME_SLIDE     7
-#define EFFECT_PORTA_UP         8
-#define EFFECT_PORTA_DOWN       9
-#define EFFECT_FINE_PORTA_UP    10
-#define EFFECT_FINE_PORTA_DOWN  11
+#define EFFECT_NONE                 0
+#define EFFECT_SET_SPEED            1
+#define EFFECT_SET_PANNING          2
+#define EFFECT_CUT_NOTE             3
+#define EFFECT_PATTERN_BREAK        4
+#define EFFECT_JUMP_TO_PATTERN      5
+#define EFFECT_ARPEGGIO             6
+#define EFFECT_VOLUME_SLIDE         7
+#define EFFECT_PORTA_UP             8
+#define EFFECT_PORTA_DOWN           9
+#define EFFECT_FINE_PORTA_UP        10
+#define EFFECT_FINE_PORTA_DOWN      11
+#define EFFECT_FINE_VOLUME_SLIDE    12
 
 #endif // UMOD_UMODPACK_H__

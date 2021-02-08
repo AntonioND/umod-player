@@ -293,6 +293,25 @@ void ModChannelUpdateAllTick(int tick_number)
                 }
             }
         }
+        else if (ch->effect == EFFECT_FINE_VOLUME_SLIDE)
+        {
+            if (tick_number == 0)
+            {
+                int volume = ch->volume + (int8_t)ch->effect_params;
+
+                if (volume > 255)
+                    volume = 255;
+
+                if (volume < 0)
+                    volume = 0;
+
+                if (volume != ch->volume)
+                {
+                    ch->volume = volume;
+                    MixerChannelSetVolume(handle, volume);
+                }
+            }
+        }
         else if (ch->effect == EFFECT_PORTA_UP)
         {
             if (tick_number > 0)

@@ -312,10 +312,6 @@ int add_mod(const char *path)
                         converted_effect_param = effect_params;
                         break;
                     }
-                    case 0x3: // Porta to note
-                    case 0x4: // Vibrato
-                    case 0x5: // Porta + Volume slide
-                    case 0x6: // Vibrato + Volume slide
                     case 0x7: // Tremolo
                         printf("Effect not supported: %X%02X\n",
                                effect_number, effect_params);
@@ -327,10 +323,6 @@ int add_mod(const char *path)
                         converted_effect_param = effect_params;
                         break;
                     }
-                    case 0x9: // Sample Offset
-                        printf("Effect not supported: %X%02X\n",
-                               effect_number, effect_params);
-                        break;
                     case 0xA: // Volume slide
                     {
                         int dec = effect_params & 0xF;
@@ -381,10 +373,6 @@ int add_mod(const char *path)
 
                         switch (effect_number)
                         {
-                            case 0x0: // Set filter
-                                printf("Effect not supported: %X%02X\n",
-                                       effect_number, effect_params);
-                                break;
                             case 0x1: // Fine porta up
                             {
                                 converted_effect = EFFECT_FINE_PORTA_UP;
@@ -397,14 +385,6 @@ int add_mod(const char *path)
                                 converted_effect_param = effect_params;
                                 break;
                             }
-                            case 0x3: // Glissando control
-                            case 0x4: // Vibrato waveform
-                            case 0x5: // Set finetune
-                            case 0x6: // Pattern loop
-                            case 0x7: // Tremolo waveform
-                                printf("Effect not supported: %X%02X\n",
-                                       effect_number, effect_params);
-                                break;
                             case 0x8: // 16 pos panning
                             {
                                 // Input:    0x0 = left, 0xF = right
@@ -413,12 +393,20 @@ int add_mod(const char *path)
                                 converted_effect_param = (effect_params * 255) / 15;
                                 break;
                             }
-                            case 0x9: // Retrig note
                             case 0xA: // Fine volume slide up
-                            case 0xB: // Fine volume slide down
-                                printf("Effect not supported: %X%02X\n",
-                                       effect_number, effect_params);
+                            {
+                                int value = effect_params * MOD_VOLUME_SCALE;
+                                converted_effect = EFFECT_FINE_VOLUME_SLIDE;
+                                converted_effect_param = value;
                                 break;
+                            }
+                            case 0xB: // Fine volume slide down
+                            {
+                                int value = effect_params * MOD_VOLUME_SCALE;
+                                converted_effect = EFFECT_FINE_VOLUME_SLIDE;
+                                converted_effect_param = -value;
+                                break;
+                            }
                             case 0xC: // Cut note
                             {
                                 // Ignore if the parameter is 0
@@ -429,17 +417,22 @@ int add_mod(const char *path)
                                 }
                                 break;
                             }
-                            case 0xD: // Delay note
-                            case 0xE: // Pattern delay
-                                printf("Effect not supported: %X%02X\n",
-                                       effect_number, effect_params);
-                                break;
                             case 0xF: // Invert loop
                                 printf("Effect not supported: EFx (Invert Loop)\n");
                                 // For now there is no intention of implementing
                                 // this effect in the future, unless there are
                                 // songs that actually use it.
                                 break;
+
+                            case 0x0: // Set filter
+                            case 0x3: // Glissando control
+                            case 0x4: // Vibrato waveform
+                            case 0x5: // Set finetune
+                            case 0x6: // Pattern loop
+                            case 0x7: // Tremolo waveform
+                            case 0x9: // Retrig note
+                            case 0xD: // Delay note
+                            case 0xE: // Pattern delay
                             default:
                                 printf("Effect not supported: %X%02X\n",
                                        effect_number, effect_params);
@@ -456,7 +449,12 @@ int add_mod(const char *path)
                         converted_effect = EFFECT_SET_SPEED;
                         converted_effect_param = effect_params;
                         break;
-                     }
+                    }
+                    case 0x3: // Porta to note
+                    case 0x4: // Vibrato
+                    case 0x5: // Porta + Volume slide
+                    case 0x6: // Vibrato + Volume slide
+                    case 0x9: // Sample Offset
                     default:
                         printf("Effect not supported: %X%02X\n",
                                effect_number, effect_params);

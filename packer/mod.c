@@ -317,7 +317,7 @@ int add_mod(const char *path)
                     case 0x5: // Porta + Volume slide
                     case 0x6: // Vibrato + Volume slide
                     case 0x7: // Tremolo
-                        printf("Effect not supported: %02X%02X\n",
+                        printf("Effect not supported: %X%02X\n",
                                effect_number, effect_params);
                         break;
                     case 0x8: // Pan
@@ -328,7 +328,7 @@ int add_mod(const char *path)
                         break;
                     }
                     case 0x9: // Sample Offset
-                        printf("Effect not supported: %02X%02X\n",
+                        printf("Effect not supported: %X%02X\n",
                                effect_number, effect_params);
                         break;
                     case 0xA: // Volume slide
@@ -402,7 +402,7 @@ int add_mod(const char *path)
                             case 0x5: // Set finetune
                             case 0x6: // Pattern loop
                             case 0x7: // Tremolo waveform
-                                printf("Effect not supported: %02X%02X\n",
+                                printf("Effect not supported: %X%02X\n",
                                        effect_number, effect_params);
                                 break;
                             case 0x8: // 16 pos panning
@@ -416,7 +416,7 @@ int add_mod(const char *path)
                             case 0x9: // Retrig note
                             case 0xA: // Fine volume slide up
                             case 0xB: // Fine volume slide down
-                                printf("Effect not supported: %02X%02X\n",
+                                printf("Effect not supported: %X%02X\n",
                                        effect_number, effect_params);
                                 break;
                             case 0xC: // Cut note
@@ -431,9 +431,14 @@ int add_mod(const char *path)
                             }
                             case 0xD: // Delay note
                             case 0xE: // Pattern delay
+                                printf("Effect not supported: %X%02X\n",
+                                       effect_number, effect_params);
+                                break;
                             case 0xF: // Invert loop
+                                printf("Effect not supported: EFx (Invert Loop)\n");
+                                break;
                             default:
-                                printf("Effect not supported: %02X%02X\n",
+                                printf("Effect not supported: %X%02X\n",
                                        effect_number, effect_params);
                                 break;
                         }
@@ -450,7 +455,7 @@ int add_mod(const char *path)
                         break;
                      }
                     default:
-                        printf("Effect not supported: %02X%02X\n",
+                        printf("Effect not supported: %X%02X\n",
                                effect_number, effect_params);
                         break;
                 }

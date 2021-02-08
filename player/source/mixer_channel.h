@@ -16,6 +16,7 @@ uint32_t MixerChannelAllocate(void);
 int MixerChannelIsPlaying(uint32_t handle);
 int MixerChannelStop(uint32_t handle);
 
+int MixerChannelSetSampleOffset(uint32_t handle, uint32_t offset);
 int MixerChannelSetNotePeriod(uint32_t handle, uint64_t period); // 48.16
 int MixerChannelSetInstrument(uint32_t handle, void *instrument_pointer);
 int MixerChannelSetVolume(uint32_t handle, int volume);

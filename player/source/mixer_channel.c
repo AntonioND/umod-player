@@ -120,6 +120,28 @@ int MixerChannelStop(uint32_t handle)
     return 1;
 }
 
+int MixerChannelSetSampleOffset(uint32_t handle, uint32_t offset)
+{
+    int channel = MixerChannelGetIndex(handle);
+
+    if (channel == -1)
+        return -1;
+
+    mixer_channel_info *ch = &mixer_channel[channel];
+
+    if (offset >= ch->sample.size)
+    {
+        // Fail if the position is out of bounds. Stop channel.
+        MixerChannelStop(handle);
+        return -1;
+    }
+
+    ch->sample.position = offset;
+    ch->sample.elapsed_ticks = 0;
+
+    return 0;
+}
+
 int MixerChannelSetNotePeriod(uint32_t handle, uint64_t period) // 48.16
 {
     int channel = MixerChannelGetIndex(handle);

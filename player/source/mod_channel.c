@@ -28,6 +28,8 @@ typedef struct {
 
     int         arpeggio_tick;
 
+    uint32_t    sample_offset; // Used for "Set Offset" effect
+
     uint32_t    mixer_channel_handle;
 } mod_channel_info;
 
@@ -358,6 +360,26 @@ void ModChannelUpdateAllTick(int tick_number)
                 uint64_t period;
                 period = ModGetSampleTickPeriodFromAmigaPeriod(ch->amiga_period);
                 MixerChannelSetNotePeriod(ch->mixer_channel_handle, period);
+            }
+        }
+        else if (ch->effect == EFFECT_SAMPLE_OFFSET)
+        {
+            if (tick_number == 0)
+            {
+                uint32_t offset = ch->effect_params << 8;
+
+                if (offset == 0)
+                {
+                    // Reload the last value used. If this effect was used
+                    // before, there will be an offset. If not, it will be 0.
+                    offset = ch->sample_offset;
+                }
+                else
+                {
+                    ch->sample_offset = offset;
+                }
+
+                MixerChannelSetSampleOffset(handle, offset);
             }
         }
 

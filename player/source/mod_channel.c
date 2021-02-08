@@ -14,15 +14,21 @@
 #include "mod_channel.h"
 
 typedef struct {
-    int     note;
-    int     volume;
-    void   *instrument_pointer;
-    int     panning; // 0...255 = left...right
-    int     effect;
-    int     effect_params;
-    int     arpeggio_tick;
+    int         note;
+    int32_t     amiga_period;
 
-    int     mixer_channel_handle;
+    int         volume;
+
+    void       *instrument_pointer;
+
+    int         panning; // 0...255 = left...right
+
+    int         effect;
+    int         effect_params;
+
+    int         arpeggio_tick;
+
+    uint32_t    mixer_channel_handle;
 } mod_channel_info;
 
 static mod_channel_info mod_channel[MOD_CHANNELS_MAX];
@@ -76,16 +82,27 @@ static uint16_t finetuned_period_table[16][12] = {
     { 1724, 1628, 1536, 1450, 1368, 1292, 1220, 1150, 1086, 1026,  968, 914 }
 };
 
+static uint32_t ModNoteToAmigaPeriod(int note_index, int finetune)
+{
+    int octave = note_index / 12;
+    int note = note_index % 12;
+
+    uint32_t amiga_period = finetuned_period_table[finetune][note] >> octave;
+
+    return amiga_period;
+}
+
 // Returns the number of ticks needed to increase the sample read pointer in an
 // instrument. For example, if it returns 4.5, the pointer in the instrument
 // must be increased after every 4.5 samples that the global mixer generates.
 //
 // It returns a fixed point number in 32.32 format.
+//
+// This function is in ARM because ARM has support for long multiplies, unlike
+// Thumb, so it is faster.
 ARM_CODE
 static uint64_t ModGetSampleTickPeriod(int note_index, int finetune)
 {
-    // TODO: Mark this function as ARM (because of the 64 bit multiply)
-
     int octave = note_index / 12;
     int note = note_index % 12;
 
@@ -123,6 +140,16 @@ static uint64_t ModGetSampleTickPeriod(int note_index, int finetune)
     return sample_tick_period;
 }
 
+ARM_CODE
+static uint64_t ModGetSampleTickPeriodFromAmigaPeriod(uint32_t amiga_period)
+{
+    const uint64_t constant = (((uint64_t)UMOD_SAMPLE_RATE * 2) << 32) / 7159090.5;
+
+    uint64_t sample_tick_period = amiga_period * constant;
+
+    return sample_tick_period;
+}
+
 void ModChannelSetNote(int channel, int note)
 {
     assert(channel < MOD_CHANNELS_MAX);
@@ -145,6 +172,9 @@ void ModChannelSetNote(int channel, int note)
         // TODO: Finetune (either default from sample, or current one of effect)
         uint64_t period = ModGetSampleTickPeriod(note, 0);
         MixerChannelSetNotePeriod(mod_ch->mixer_channel_handle, period);
+
+        uint32_t amiga_period = ModNoteToAmigaPeriod(note, 0);
+        mod_ch->amiga_period = amiga_period;
     }
 }
 
@@ -240,6 +270,9 @@ void ModChannelUpdateAllTick(int tick_number)
             // TODO: Finetune
             uint64_t period = ModGetSampleTickPeriod(note, 0);
             MixerChannelSetNotePeriod(ch->mixer_channel_handle, period);
+
+            uint32_t amiga_period = ModNoteToAmigaPeriod(note, 0);
+            ch->amiga_period = amiga_period;
         }
         else if (ch->effect == EFFECT_VOLUME_SLIDE)
         {
@@ -258,6 +291,30 @@ void ModChannelUpdateAllTick(int tick_number)
                     ch->volume = volume;
                     MixerChannelSetVolume(handle, volume);
                 }
+            }
+        }
+        else if (ch->effect == EFFECT_PORTA_UP)
+        {
+            if (tick_number > 0)
+            {
+                ch->amiga_period -= (uint8_t)ch->effect_params;
+                if (ch->amiga_period < 1)
+                    ch->amiga_period = 1;
+
+                uint64_t period;
+                period = ModGetSampleTickPeriodFromAmigaPeriod(ch->amiga_period);
+                MixerChannelSetNotePeriod(ch->mixer_channel_handle, period);
+            }
+        }
+        else if (ch->effect == EFFECT_PORTA_DOWN)
+        {
+            if (tick_number > 0)
+            {
+                ch->amiga_period += (uint8_t)ch->effect_params;
+
+                uint64_t period;
+                period = ModGetSampleTickPeriodFromAmigaPeriod(ch->amiga_period);
+                MixerChannelSetNotePeriod(ch->mixer_channel_handle, period);
             }
         }
 

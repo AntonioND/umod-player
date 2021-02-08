@@ -301,7 +301,17 @@ int add_mod(const char *path)
                         break;
                     }
                     case 0x1: // Porta up
+                    {
+                        converted_effect = EFFECT_PORTA_UP;
+                        converted_effect_param = effect_params;
+                        break;
+                    }
                     case 0x2: // Porta down
+                    {
+                        converted_effect = EFFECT_PORTA_DOWN;
+                        converted_effect_param = effect_params;
+                        break;
+                    }
                     case 0x3: // Porta to note
                     case 0x4: // Vibrato
                     case 0x5: // Porta + Volume slide

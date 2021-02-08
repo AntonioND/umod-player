@@ -263,7 +263,7 @@ static void UMOD_Tick(void)
             {
                 loaded_song.current_pattern++;
 
-                if (loaded_song.current_pattern == loaded_song.length)
+                if (loaded_song.current_pattern >= loaded_song.length)
                 {
                     loaded_song.playing = 0;
                     ModChannelResetAll();

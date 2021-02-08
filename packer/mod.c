@@ -373,6 +373,12 @@ int add_mod(const char *path)
 
                         switch (effect_number)
                         {
+                            case 0x0: // Set filter
+                                printf("Effect not supported: E0x (Set Filter)\n");
+                                // For now there is no intention of implementing
+                                // this effect in the future, as it has to do
+                                // with a hardware filter of the Amiga.
+                                break;
                             case 0x1: // Fine porta up
                             {
                                 converted_effect = EFFECT_FINE_PORTA_UP;
@@ -424,7 +430,6 @@ int add_mod(const char *path)
                                 // songs that actually use it.
                                 break;
 
-                            case 0x0: // Set filter
                             case 0x3: // Glissando control
                             case 0x4: // Vibrato waveform
                             case 0x5: // Set finetune

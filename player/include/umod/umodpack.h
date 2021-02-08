@@ -61,5 +61,7 @@ typedef struct {
 #define EFFECT_VOLUME_SLIDE     7
 #define EFFECT_PORTA_UP         8
 #define EFFECT_PORTA_DOWN       9
+#define EFFECT_FINE_PORTA_UP    10
+#define EFFECT_FINE_PORTA_DOWN  11
 
 #endif // UMOD_UMODPACK_H__

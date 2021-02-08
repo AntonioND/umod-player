@@ -382,8 +382,21 @@ int add_mod(const char *path)
                         switch (effect_number)
                         {
                             case 0x0: // Set filter
+                                printf("Effect not supported: %X%02X\n",
+                                       effect_number, effect_params);
+                                break;
                             case 0x1: // Fine porta up
+                            {
+                                converted_effect = EFFECT_FINE_PORTA_UP;
+                                converted_effect_param = effect_params;
+                                break;
+                            }
                             case 0x2: // Fine porta down
+                            {
+                                converted_effect = EFFECT_FINE_PORTA_DOWN;
+                                converted_effect_param = effect_params;
+                                break;
+                            }
                             case 0x3: // Glissando control
                             case 0x4: // Vibrato waveform
                             case 0x5: // Set finetune

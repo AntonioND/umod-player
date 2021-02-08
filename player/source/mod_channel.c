@@ -306,9 +306,33 @@ void ModChannelUpdateAllTick(int tick_number)
                 MixerChannelSetNotePeriod(ch->mixer_channel_handle, period);
             }
         }
+        else if (ch->effect == EFFECT_FINE_PORTA_UP)
+        {
+            if (tick_number == 0)
+            {
+                ch->amiga_period -= (uint8_t)ch->effect_params;
+                if (ch->amiga_period < 1)
+                    ch->amiga_period = 1;
+
+                uint64_t period;
+                period = ModGetSampleTickPeriodFromAmigaPeriod(ch->amiga_period);
+                MixerChannelSetNotePeriod(ch->mixer_channel_handle, period);
+            }
+        }
         else if (ch->effect == EFFECT_PORTA_DOWN)
         {
             if (tick_number > 0)
+            {
+                ch->amiga_period += (uint8_t)ch->effect_params;
+
+                uint64_t period;
+                period = ModGetSampleTickPeriodFromAmigaPeriod(ch->amiga_period);
+                MixerChannelSetNotePeriod(ch->mixer_channel_handle, period);
+            }
+        }
+        else if (ch->effect == EFFECT_FINE_PORTA_DOWN)
+        {
+            if (tick_number == 0)
             {
                 ch->amiga_period += (uint8_t)ch->effect_params;
 

@@ -18,6 +18,15 @@ typedef struct {
     int left_volume; // combined volume * left_panning
     int right_volume; // combined volume * right_panning
 
+#define STATE_STOP 0
+#define STATE_PLAY 1
+#define STATE_LOOP 2
+
+    // Set to loop after the first time the sample is played, if loop_start > 4
+    // Note that in the mod file it would be 2, but the size is divided by 2
+    // in the file, and it is multiplied by 2 by the packer.
+    int play_state;
+
     struct {
         uint8_t    *pointer; // Pointer to sample data
         size_t      size;
@@ -115,7 +124,7 @@ int MixerChannelStop(uint32_t handle)
 
     mixer_channel_info *ch = &mixer_channel[channel];
 
-    ch->sample.pointer = NULL;
+    ch->play_state = STATE_STOP;
 
     return 1;
 }
@@ -157,6 +166,9 @@ int MixerChannelSetNotePeriod(uint32_t handle, uint64_t period) // 48.16
     ch->sample.position = 0;
     ch->sample.elapsed_ticks = 0;
     ch->sample.period = period;
+
+    ch->sample.position = 0;
+    ch->play_state = STATE_PLAY;
 
     return 0;
 }
@@ -242,6 +254,9 @@ void MixerMix(uint8_t *left_buffer, uint8_t *right_buffer, size_t buffer_size)
             //if ((used_channel_flags & (1 << channel)) == 0)
             //    continue;
 
+            if (ch->play_state == STATE_STOP)
+                continue;
+
             if (ch->sample.pointer == NULL)
                 continue;
 
@@ -258,11 +273,28 @@ void MixerMix(uint8_t *left_buffer, uint8_t *right_buffer, size_t buffer_size)
                 ch->sample.elapsed_ticks -= ch->sample.period;
                 ch->sample.position++;
 
-                if (ch->sample.position >= ch->sample.size)
+                if (ch->play_state == STATE_PLAY)
                 {
-                    ch->sample.position = 0;
-
-                    // TODO: loop_start loop_end
+                    if (ch->sample.position >= ch->sample.size)
+                    {
+                        if (ch->sample.loop_start < 4)
+                        {
+                            ch->sample.position = 0;
+                            ch->play_state = STATE_STOP;
+                        }
+                        else
+                        {
+                            ch->sample.position = ch->sample.loop_start;
+                            ch->play_state = STATE_LOOP;
+                        }
+                    }
+                }
+                else // if (ch->play_state == STATE_LOOP)
+                {
+                    if (ch->sample.position >= ch->sample.loop_end)
+                    {
+                        ch->sample.position = ch->sample.loop_start;
+                    }
                 }
             }
         }

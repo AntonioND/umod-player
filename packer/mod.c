@@ -436,6 +436,9 @@ int add_mod(const char *path)
                                 break;
                             case 0xF: // Invert loop
                                 printf("Effect not supported: EFx (Invert Loop)\n");
+                                // For now there is no intention of implementing
+                                // this effect in the future, unless there are
+                                // songs that actually use it.
                                 break;
                             default:
                                 printf("Effect not supported: %X%02X\n",

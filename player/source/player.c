@@ -226,35 +226,49 @@ static void UMOD_Tick(void)
     {
         uint8_t flags = *loaded_song.pattern_position++;
 
-        if (flags & STEP_HAS_INSTRUMENT)
-        {
-            uint8_t instrument = *loaded_song.pattern_position++;
-            //printf("I: %u ", instrument);
+        int instrument = -1;
+        int note = -1;
+        int volume = -1;
+        int effect = -1;
+        int effect_params = -1;
 
+        if (flags & STEP_HAS_INSTRUMENT)
+            instrument = *loaded_song.pattern_position++;
+
+        if (flags & STEP_HAS_NOTE)
+            note = *loaded_song.pattern_position++;
+
+        if (flags & STEP_HAS_VOLUME)
+            volume = *loaded_song.pattern_position++;
+
+        if (flags & STEP_HAS_EFFECT)
+        {
+            effect = *loaded_song.pattern_position++;
+            effect_params = *loaded_song.pattern_position++;
+        }
+
+        if (instrument != -1)
+        {
             void *instrument_pointer = InstrumentGetPointer(instrument);
             ModChannelSetInstrument(c, instrument_pointer);
         }
 
-        if (flags & STEP_HAS_NOTE)
+        if (note != -1)
         {
-            uint8_t note = *loaded_song.pattern_position++;
-            //printf("N: %u ", note);
             ModChannelSetNote(c, note);
         }
 
-        if (flags & STEP_HAS_VOLUME)
+        if (volume != -1)
         {
-            uint8_t volume = *loaded_song.pattern_position++;
-            //printf("V: %u ", volume);
             ModChannelSetVolume(c, volume);
         }
 
-        if (flags & STEP_HAS_EFFECT)
+        if (effect == -1)
         {
-            uint8_t effect = *loaded_song.pattern_position++;
-            uint8_t effect_params = *loaded_song.pattern_position++;
-            //printf("E: %u %u ", effect, effect_params);
-
+            ModChannelSetEffect(c, EFFECT_NONE, 0);
+        }
+        else
+        {
             if (effect == EFFECT_SET_SPEED)
             {
                 SetSpeed(effect_params);
@@ -284,10 +298,6 @@ static void UMOD_Tick(void)
             {
                 ModChannelSetEffect(c, effect, effect_params);
             }
-        }
-        else
-        {
-            ModChannelSetEffect(c, EFFECT_NONE, 0);
         }
     }
 

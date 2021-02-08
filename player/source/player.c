@@ -256,8 +256,11 @@ static void UMOD_Tick(void)
 
         if (note != -1)
         {
-            if (effect != EFFECT_PORTA_TO_NOTE)
+            if ((effect != EFFECT_PORTA_TO_NOTE) &&
+                (effect != EFFECT_PORTA_VOL_SLIDE))
+            {
                 ModChannelSetNote(c, note);
+            }
         }
 
         if (volume != -1)

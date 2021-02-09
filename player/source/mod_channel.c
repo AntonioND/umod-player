@@ -481,9 +481,10 @@ void ModChannelUpdateAllTick(int tick_number)
             return;
         }
 
-        if (ch->effect == EFFECT_VIBRATO)
+        if ((ch->effect == EFFECT_VIBRATO) ||
+            (ch->effect == EFFECT_VIBRATO_VOL_SLIDE))
         {
-            if (tick_number == 0)
+            if ((tick_number == 0) && (ch->effect == EFFECT_VIBRATO))
             {
                 if (ch->effect_params != 0)
                     ch->vibrato_args = ch->effect_params;
@@ -505,7 +506,8 @@ void ModChannelUpdateAllTick(int tick_number)
         }
 
         if ((ch->effect == EFFECT_VOLUME_SLIDE) ||
-            (ch->effect == EFFECT_PORTA_VOL_SLIDE))
+            (ch->effect == EFFECT_PORTA_VOL_SLIDE) ||
+            (ch->effect == EFFECT_VIBRATO_VOL_SLIDE))
         {
             if (tick_number > 0)
             {

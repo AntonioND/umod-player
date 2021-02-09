@@ -345,6 +345,27 @@ int add_mod(const char *path)
 
                         break;
                     }
+                    case 0x6: // Vibrato + Volume slide
+                    {
+                        converted_effect = EFFECT_VIBRATO;
+                        converted_effect_param = 0;
+
+                        int dec = effect_params & 0xF;
+                        int inc = effect_params >> 4;
+
+                        // If both are set, ignore effect
+                        if ((dec > 0) && (inc > 0))
+                            break;
+
+                        converted_effect = EFFECT_VIBRATO_VOL_SLIDE;
+
+                        if (inc > 0)
+                            converted_effect_param = inc * MOD_VOLUME_SCALE;
+                        if (dec > 0)
+                            converted_effect_param = -dec * MOD_VOLUME_SCALE;
+
+                        break;
+                    }
                     case 0x8: // Pan
                     {
                         // 0x00 = left, 0xFF = right
@@ -490,7 +511,6 @@ int add_mod(const char *path)
                         converted_effect_param = effect_params;
                         break;
                     }
-                    case 0x6: // Vibrato + Volume slide
                     case 0x7: // Tremolo
                     default:
                         printf("Effect not supported: %X%02X\n",

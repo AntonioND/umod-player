@@ -318,6 +318,12 @@ int add_mod(const char *path)
                         converted_effect_param = effect_params;
                         break;
                     }
+                    case 0x4: // Vibrato
+                    {
+                        converted_effect = EFFECT_VIBRATO;
+                        converted_effect_param = effect_params;
+                        break;
+                    }
                     case 0x5: // Porta + Volume slide
                     {
                         converted_effect = EFFECT_PORTA_TO_NOTE;
@@ -484,7 +490,6 @@ int add_mod(const char *path)
                         converted_effect_param = effect_params;
                         break;
                     }
-                    case 0x4: // Vibrato
                     case 0x6: // Vibrato + Volume slide
                     case 0x7: // Tremolo
                     default:

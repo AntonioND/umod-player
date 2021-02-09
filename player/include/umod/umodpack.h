@@ -67,6 +67,7 @@ typedef struct {
 #define EFFECT_SAMPLE_OFFSET        13
 #define EFFECT_PORTA_TO_NOTE        14
 #define EFFECT_PORTA_VOL_SLIDE      15
+#define EFFECT_VIBRATO              16
 // TODO: Reorder effect numbers
 
 #endif // UMOD_UMODPACK_H__

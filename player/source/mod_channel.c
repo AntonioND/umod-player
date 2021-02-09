@@ -28,6 +28,9 @@ typedef struct {
 
     int         arpeggio_tick;
 
+    int         vibrato_tick;
+    int         vibrato_args;
+
     int32_t     porta_to_note_target_amiga_period;
     int         porta_to_note_speed;
 
@@ -155,6 +158,17 @@ static uint64_t ModGetSampleTickPeriodFromAmigaPeriod(uint32_t amiga_period)
     return sample_tick_period;
 }
 
+static int16_t vibrato_sine_wave[64] = {
+       0,   24,   49,   74,   97,  120,  141,  161,
+     180,  197,  212,  224,  235,  244,  250,  253,
+     255,  253,  250,  244,  235,  224,  212,  197,
+     180,  161,  141,  120,   97,   74,   49,   24,
+       0,  -24,  -49,  -74,  -97, -120, -141, -161,
+    -180, -197, -212, -224, -235, -244, -250, -253,
+    -255, -253, -250, -244, -235, -224, -212, -197,
+    -180, -161, -141, -120,  -97,  -74,  -49,  -24
+};
+
 static uint32_t ModChannelAllocateMixer(mod_channel_info *mod_ch)
 {
     uint32_t handle = MixerChannelAllocate();
@@ -169,6 +183,8 @@ void ModChannelSetNote(int channel, int note)
 
     mod_channel_info *mod_ch = &mod_channel[channel];
     mod_ch->note = note;
+
+    mod_ch->vibrato_tick = 0;
 
     uint32_t handle;
 
@@ -463,6 +479,29 @@ void ModChannelUpdateAllTick(int tick_number)
             }
 
             return;
+        }
+
+        if (ch->effect == EFFECT_VIBRATO)
+        {
+            if (tick_number == 0)
+            {
+                if (ch->effect_params != 0)
+                    ch->vibrato_args = ch->effect_params;
+            }
+            else if (tick_number > 0)
+            {
+                int speed = ch->vibrato_args >> 4;
+                int depth = ch->vibrato_args & 0xF;
+
+                ch->vibrato_tick = (ch->vibrato_tick + speed) & 63;
+
+                int sine = vibrato_sine_wave[ch->vibrato_tick];
+
+                int value = (sine * depth) >> 7;
+
+                uint64_t period = ModGetSampleTickPeriodFromAmigaPeriod(ch->amiga_period + value);
+                MixerChannelSetNotePeriod(ch->mixer_channel_handle, period);
+            }
         }
 
         if ((ch->effect == EFFECT_VOLUME_SLIDE) ||

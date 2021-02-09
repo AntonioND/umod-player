@@ -42,7 +42,18 @@ int add_file(const char *path)
 
 int main(int argc, char *argv[])
 {
-    argc--;
+    if (argc < 3)
+    {
+        printf("Not enough arguments.\n");
+        return -1;
+    }
+
+    const char *save_file = argv[1];
+
+    argc--; // Skip argv[0]
+    argv++;
+
+    argc--; // Skip argv[1]
     argv++;
 
     for (int i = 0; i < argc; i++)
@@ -53,5 +64,5 @@ int main(int argc, char *argv[])
             return ret;
     }
 
-    return save_pack("pack.bin");
+    return save_pack(save_file);
 }

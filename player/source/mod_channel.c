@@ -288,11 +288,9 @@ void ModChannelSetEffect(int channel, int effect, int effect_params, int note)
     mod_ch->effect = effect;
     mod_ch->effect_params = effect_params;
 
-    uint32_t handle;
-
     if (mod_ch->mixer_channel_handle == MIXER_HANDLE_INVALID)
     {
-        handle = ModChannelAllocateMixer(mod_ch);
+        uint32_t handle = ModChannelAllocateMixer(mod_ch);
 
         MixerChannelSetInstrument(handle, mod_ch->instrument_pointer);
         MixerChannelSetVolume(handle, mod_ch->volume);
@@ -311,6 +309,7 @@ void ModChannelSetEffect(int channel, int effect, int effect_params, int note)
     }
     else if (effect == EFFECT_SET_PANNING)
     {
+        uint32_t handle = mod_ch->mixer_channel_handle;
         mod_ch->panning = effect_params;
         MixerChannelSetPanning(handle, mod_ch->panning);
     }

@@ -201,7 +201,7 @@ static void UMOD_Tick(void)
 
     loaded_song.current_ticks = 0;
 
-    if (loaded_song.current_row == loaded_song.pattern_rows)
+    if (loaded_song.current_row >= loaded_song.pattern_rows)
     {
         loaded_song.current_pattern++;
         loaded_song.current_row = 0;
@@ -284,9 +284,9 @@ static void UMOD_Tick(void)
 
                 if (loaded_song.current_pattern >= loaded_song.length)
                 {
-                    loaded_song.playing = 0;
-                    ModChannelResetAll();
-                    return;
+                    // The next time that it's time to increment the row number,
+                    // overflow pattern, which will reach the end of the song.
+                    loaded_song.current_row = loaded_song.pattern_rows;
                 }
                 else
                 {

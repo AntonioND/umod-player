@@ -10,6 +10,11 @@ set(C_STANDARD 11)
 set(C_EXTENSIONS OFF)
 set(C_STANDARD_REQUIRED ON)
 
+# Detect if this project is a submodule
+
+get_directory_property(PROJECT_HAS_PARENT PARENT_DIRECTORY)
+set(PROJECT_IS_SUBMODULE ${PROJECT_HAS_PARENT})
+
 # Global compiler-specific options
 
 include(cmake/compiler_flags.cmake)
@@ -26,3 +31,11 @@ endmacro()
 add_subdirectory(player)
 add_subdirectory(packer)
 add_subdirectory(renderer)
+
+# If this project is being used as a module within another project, remove all
+# testing from the build.
+if(NOT PROJECT_IS_SUBMODULE)
+    enable_testing()
+
+    add_subdirectory(tests)
+endif()

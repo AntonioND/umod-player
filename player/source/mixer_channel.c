@@ -277,7 +277,7 @@ void MixerMix(uint8_t *left_buffer, uint8_t *right_buffer, size_t buffer_size)
                 {
                     if (ch->sample.position >= ch->sample.size)
                     {
-                        if (ch->sample.loop_start < 4)
+                        if (ch->sample.loop_end == ch->sample.loop_start)
                         {
                             ch->sample.position = 0;
                             ch->play_state = STATE_STOP;

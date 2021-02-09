@@ -495,7 +495,7 @@ int add_mod(const char *path)
                             case 0xD: // Delay note
                             case 0xE: // Pattern delay
                             default:
-                                printf("Effect not supported: %X%02X\n",
+                                printf("Effect not supported: E%X%X\n",
                                        effect_number, effect_params);
                                 break;
                         }

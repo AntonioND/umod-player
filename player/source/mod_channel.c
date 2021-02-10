@@ -350,7 +350,7 @@ void ModChannelUpdateAllTick(int tick_number)
                 MixerChannelSetVolume(handle, 0);
             }
 
-            return;
+            continue;
         }
         else if (ch->effect == EFFECT_ARPEGGIO)
         {
@@ -378,7 +378,7 @@ void ModChannelUpdateAllTick(int tick_number)
             uint32_t amiga_period = ModNoteToAmigaPeriod(note, 0);
             ch->amiga_period = amiga_period;
 
-            return;
+            continue;
         }
         else if (ch->effect == EFFECT_FINE_VOLUME_SLIDE)
         {
@@ -399,7 +399,7 @@ void ModChannelUpdateAllTick(int tick_number)
                 }
             }
 
-            return;
+            continue;
         }
         else if (ch->effect == EFFECT_PORTA_UP)
         {
@@ -414,7 +414,7 @@ void ModChannelUpdateAllTick(int tick_number)
                 MixerChannelSetNotePeriod(ch->mixer_channel_handle, period);
             }
 
-            return;
+            continue;
         }
         else if (ch->effect == EFFECT_FINE_PORTA_UP)
         {
@@ -429,7 +429,7 @@ void ModChannelUpdateAllTick(int tick_number)
                 MixerChannelSetNotePeriod(ch->mixer_channel_handle, period);
             }
 
-            return;
+            continue;
         }
         else if (ch->effect == EFFECT_PORTA_DOWN)
         {
@@ -442,7 +442,7 @@ void ModChannelUpdateAllTick(int tick_number)
                 MixerChannelSetNotePeriod(ch->mixer_channel_handle, period);
             }
 
-            return;
+            continue;
         }
         else if (ch->effect == EFFECT_FINE_PORTA_DOWN)
         {
@@ -455,7 +455,7 @@ void ModChannelUpdateAllTick(int tick_number)
                 MixerChannelSetNotePeriod(ch->mixer_channel_handle, period);
             }
 
-            return;
+            continue;
         }
         else if (ch->effect == EFFECT_SAMPLE_OFFSET)
         {
@@ -477,7 +477,7 @@ void ModChannelUpdateAllTick(int tick_number)
                 MixerChannelSetSampleOffset(handle, offset);
             }
 
-            return;
+            continue;
         }
 
         if ((ch->effect == EFFECT_VIBRATO) ||

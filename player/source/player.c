@@ -219,6 +219,7 @@ static void UMOD_Tick(void)
     }
 
     int jump_to_pattern = -1;
+    int pattern_break = -1;
 
     //printf("%d/%d : ", loaded_song.current_row, loaded_song.pattern_rows);
     //setvbuf(stdout, 0, _IONBF, 0);
@@ -280,20 +281,7 @@ static void UMOD_Tick(void)
             }
             else if (effect == EFFECT_PATTERN_BREAK)
             {
-                loaded_song.current_pattern++;
-
-                if (loaded_song.current_pattern >= loaded_song.length)
-                {
-                    // The next time that it's time to increment the row number,
-                    // overflow pattern, which will reach the end of the song.
-                    loaded_song.current_row = loaded_song.pattern_rows;
-                }
-                else
-                {
-                    ReloadPatternData();
-                    SeekRow(effect_params);
-                    loaded_song.current_row--;
-                }
+                pattern_break = effect_params;
             }
             else if (effect == EFFECT_JUMP_TO_PATTERN)
             {
@@ -312,7 +300,23 @@ static void UMOD_Tick(void)
 
     ModChannelUpdateAllRow();
 
-    if (jump_to_pattern >= 0)
+    if (pattern_break >= 0)
+    {
+        loaded_song.current_pattern++;
+
+        if (loaded_song.current_pattern >= loaded_song.length)
+        {
+            // The next time that it's time to increment the row number,
+            // overflow pattern, which will reach the end of the song.
+            loaded_song.current_row = loaded_song.pattern_rows;
+        }
+        else
+        {
+            ReloadPatternData();
+            SeekRow(pattern_break);
+        }
+    }
+    else if (jump_to_pattern >= 0)
     {
         loaded_song.current_pattern = jump_to_pattern;
         ReloadPatternData();

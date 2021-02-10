@@ -398,9 +398,6 @@ int add_mod(const char *path)
                     }
                     case 0xB: // Jump to pattern
                     {
-                        if (effect_params > max_pattern_index)
-                            effect_params = max_pattern_index;
-
                         converted_effect = EFFECT_JUMP_TO_PATTERN;
                         converted_effect_param = effect_params;
                         break;

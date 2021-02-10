@@ -319,8 +319,17 @@ static void UMOD_Tick(void)
     else if (jump_to_pattern >= 0)
     {
         loaded_song.current_pattern = jump_to_pattern;
-        ReloadPatternData();
-        loaded_song.current_row = 0;
+        if (loaded_song.current_pattern < loaded_song.length)
+        {
+            ReloadPatternData();
+            loaded_song.current_row = 0;
+        }
+        else
+        {
+            // The next time that it's time to increment the row number,
+            // overflow pattern, which will reach the end of the song.
+            loaded_song.current_row = loaded_song.pattern_rows;
+        }
     }
     else
     {

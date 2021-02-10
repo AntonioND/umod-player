@@ -2,6 +2,7 @@
 #
 # Copyright (c) 2021 Antonio Niño Díaz
 
+test_mod_wav("jump_to_pattern.mod")
 test_mod_wav("porta_up_down.mod")
 test_mod_wav("panning.mod")
 test_mod_wav("pattern_break.mod")

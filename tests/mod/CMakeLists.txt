@@ -37,6 +37,10 @@ test_mod_wav("sample_offset.mod")
 # and samples that don't loop.
 test_mod_wav("sample_that_loops.mod")
 
+# Tests effect Fxy both for values that change the speed and values that change
+# the BPM. Make sure that F00 is ignored.
+test_mod_wav("speed.mod")
+
 # Tests effects 4xy and 6xy.
 test_mod_wav("vibrato.mod")
 

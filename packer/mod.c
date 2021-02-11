@@ -496,7 +496,7 @@ int add_mod(const char *path)
                     }
                     case 0xF: // Set speed
                     {
-                        // Ignore if the parameter is 0 (this is used as NOP)
+                        // Ignore if the parameter is 0
                         if (effect_params == 0)
                             break;
 

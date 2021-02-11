@@ -468,12 +468,8 @@ int add_mod(const char *path)
                             }
                             case 0xC: // Cut note
                             {
-                                // Ignore if the parameter is 0
-                                if (effect_params > 0)
-                                {
-                                    converted_effect = EFFECT_CUT_NOTE;
-                                    converted_effect_param = effect_params;
-                                }
+                                converted_effect = EFFECT_CUT_NOTE;
+                                converted_effect_param = effect_params;
                                 break;
                             }
                             case 0xF: // Invert loop

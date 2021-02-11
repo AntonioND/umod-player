@@ -2,6 +2,10 @@
 #
 # Copyright (c) 2021 Antonio Niño Díaz
 
+# Test ECx including some corner cases (like EC0, or ECx at the same time as Bxy
+# or Dxy).
+test_mod_wav("cut_note.mod")
+
 # Test effect Bxy and some corner cases like having it twice in the same row.
 test_mod_wav("jump_to_pattern.mod")
 

@@ -12,6 +12,9 @@ test_mod_wav("jump_to_pattern.mod")
 # Test effects Bxy and Dxy in the same row.
 test_mod_wav("jump_to_pattern_plus_pattern_break.mod")
 
+# Tests effects 3xy and 5xy.
+test_mod_wav("porta_to_note.mod")
+
 # Tests effects 1xy, 2xy, E1x and E2x.
 test_mod_wav("porta_up_down.mod")
 

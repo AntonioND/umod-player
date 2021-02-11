@@ -318,7 +318,8 @@ void ModChannelSetEffect(int channel, int effect, int effect_params, int note)
     }
     else if (effect == EFFECT_ARPEGGIO)
     {
-        mod_ch->arpeggio_tick = 0;
+        if (note != 0) // ???
+            mod_ch->arpeggio_tick = 0;
     }
     else if (effect == EFFECT_PORTA_TO_NOTE)
     {

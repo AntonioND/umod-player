@@ -31,6 +31,9 @@ typedef struct {
     int         vibrato_tick;
     int         vibrato_args;
 
+    int         tremolo_tick;
+    int         tremolo_args;
+
     int32_t     porta_to_note_target_amiga_period;
     int         porta_to_note_speed;
 
@@ -158,7 +161,7 @@ static uint64_t ModGetSampleTickPeriodFromAmigaPeriod(uint32_t amiga_period)
     return sample_tick_period;
 }
 
-static int16_t vibrato_sine_wave[64] = {
+static int16_t vibrato_tremolo_sine_wave[64] = {
        0,   24,   49,   74,   97,  120,  141,  161,
      180,  197,  212,  224,  235,  244,  250,  253,
      255,  253,  250,  244,  235,  224,  212,  197,
@@ -327,6 +330,14 @@ void ModChannelSetEffect(int channel, int effect, int effect_params, int note)
             mod_ch->porta_to_note_speed = effect_params;
         }
     }
+    else if (effect == EFFECT_TREMOLO)
+    {
+        if (note != 0)
+            mod_ch->tremolo_tick = 0;
+
+        if (effect_params != 0)
+            mod_ch->tremolo_args = effect_params;
+    }
 
     // TODO
 }
@@ -479,6 +490,33 @@ void ModChannelUpdateAllTick(int tick_number)
 
             continue;
         }
+        else if (ch->effect == EFFECT_TREMOLO)
+        {
+            if (tick_number > 0)
+            {
+                int speed = ch->tremolo_args >> 4;
+                int depth = ch->tremolo_args & 0xF;
+
+                ch->tremolo_tick = (ch->tremolo_tick + speed) & 63;
+
+                int sine = vibrato_tremolo_sine_wave[ch->tremolo_tick];
+
+                // Divide by 64, but multiply by 4 (Volume goes from 0 to 255,
+                // but it goes from 0 to 64 in the MOD format).
+                int value = (sine * depth) >> (6 - 2);
+
+                int volume = ch->volume + value;
+
+                if (volume < 0)
+                    volume = 0;
+                else if (volume > 255)
+                    volume = 255;
+
+                MixerChannelSetVolume(ch->mixer_channel_handle, volume);
+            }
+
+            continue;
+        }
 
         if ((ch->effect == EFFECT_VIBRATO) ||
             (ch->effect == EFFECT_VIBRATO_VOL_SLIDE))
@@ -495,9 +533,9 @@ void ModChannelUpdateAllTick(int tick_number)
 
                 ch->vibrato_tick = (ch->vibrato_tick + speed) & 63;
 
-                int sine = vibrato_sine_wave[ch->vibrato_tick];
+                int sine = vibrato_tremolo_sine_wave[ch->vibrato_tick];
 
-                int value = (sine * depth) >> 7;
+                int value = (sine * depth) >> 7; // Divide by 128
 
                 uint64_t period = ModGetSampleTickPeriodFromAmigaPeriod(ch->amiga_period + value);
                 MixerChannelSetNotePeriod(ch->mixer_channel_handle, period);

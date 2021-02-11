@@ -366,6 +366,12 @@ int add_mod(const char *path)
 
                         break;
                     }
+                    case 0x7: // Tremolo
+                    {
+                        converted_effect = EFFECT_TREMOLO;
+                        converted_effect_param = effect_params;
+                        break;
+                    }
                     case 0x8: // Pan
                     {
                         // 0x00 = left, 0xFF = right
@@ -504,7 +510,6 @@ int add_mod(const char *path)
                         converted_effect_param = effect_params;
                         break;
                     }
-                    case 0x7: // Tremolo
                     default:
                         printf("Effect not supported: %X%02X\n",
                                effect_number, effect_params);

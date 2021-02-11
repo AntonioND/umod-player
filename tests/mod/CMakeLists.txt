@@ -41,6 +41,10 @@ test_mod_wav("sample_that_loops.mod")
 # the BPM. Make sure that F00 is ignored.
 test_mod_wav("speed.mod")
 
+# Tests effect 7xy and how it interacts with Cxy. Cxy should set the base volume
+# for 7xy to ondulate around.
+test_mod_wav("tremolo.mod")
+
 # Tests effects 4xy and 6xy.
 test_mod_wav("vibrato.mod")
 

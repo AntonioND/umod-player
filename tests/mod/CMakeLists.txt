@@ -2,6 +2,9 @@
 #
 # Copyright (c) 2021 Antonio Niño Díaz
 
+# Test effect 0xx, including 000, which is a "no effect" effect.
+test_mod_wav("arpeggio.mod")
+
 # Test ECx including some corner cases (like EC0, or ECx at the same time as Bxy
 # or Dxy).
 test_mod_wav("cut_note.mod")

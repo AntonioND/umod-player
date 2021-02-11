@@ -30,7 +30,7 @@ test_mod_wav("pattern_break.mod")
 # Tests full range of notes from C-3 to B-8.
 test_mod_wav("range_test.mod")
 
-# Tests behaviour of effect 9xy.
+# Tests behaviour of effect 9xy, both for samples that loop and that don't.
 test_mod_wav("sample_offset.mod")
 
 # Tests behaviour of samples that loop (different parts of the sample waveform)

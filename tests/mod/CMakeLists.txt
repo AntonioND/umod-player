@@ -34,5 +34,10 @@ test_mod_wav("sample_that_loops.mod")
 # Tests effects 4xy and 6xy.
 test_mod_wav("vibrato.mod")
 
+# Test Cxy effect. Test that ECx effect sets the volume to 0 and the channel can
+# be made to sound again with a Cxy effect. Also, test samples with different
+# default volumes.
+test_mod_wav("volume.mod")
+
 # Tests effects Axy, EAx, EBx.
 test_mod_wav("volume_slide.mod")

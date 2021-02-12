@@ -10,7 +10,7 @@
 
 #define UMOD_SAMPLE_RATE    (32 * 1024)
 
-int UMOD_LoadPack(void *pack);
+int UMOD_LoadPack(const void *pack);
 int UMOD_PlaySong(uint32_t index);
 void UMOD_Mix(uint8_t *left_buffer, uint8_t *right_buffer, size_t buffer_size);
 int UMOD_IsPlayingSong(void);

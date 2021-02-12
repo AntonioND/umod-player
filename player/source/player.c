@@ -14,7 +14,7 @@
 #include "mod_channel.h"
 
 typedef struct {
-    void       *data;
+    const void *data;
     uint32_t    num_songs;
     uint32_t    num_patterns;
     uint32_t    num_instruments;
@@ -25,9 +25,9 @@ typedef struct {
 
 static umod_loaded_pack loaded_pack;
 
-int UMOD_LoadPack(void *pack)
+int UMOD_LoadPack(const void *pack)
 {
-    umodpack_header *header = pack;
+    const umodpack_header *header = pack;
 
     if ((header->magic[0] != 'U') || (header->magic[1] != 'M') ||
         (header->magic[2] != 'O') || (header->magic[3] != 'D'))

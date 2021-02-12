@@ -39,12 +39,69 @@ typedef struct {
     int32_t     porta_to_note_target_amiga_period;
     int         porta_to_note_speed;
 
+    int16_t    *vibrato_wave_table;
+    int         vibrato_retrigger;
+
+    int16_t    *tremolo_wave_table;
+    int         tremolo_retrigger;
+
     uint32_t    sample_offset; // Used for "Set Offset" effect
 
     uint32_t    mixer_channel_handle;
 } mod_channel_info;
 
 static mod_channel_info mod_channel[MOD_CHANNELS_MAX];
+
+// Taken from FMODDOC.TXT
+static int16_t vibrato_tremolo_wave_sine[64] = {
+       0,   24,   49,   74,   97,  120,  141,  161,
+     180,  197,  212,  224,  235,  244,  250,  253,
+     255,  253,  250,  244,  235,  224,  212,  197,
+     180,  161,  141,  120,   97,   74,   49,   24,
+       0,  -24,  -49,  -74,  -97, -120, -141, -161,
+    -180, -197, -212, -224, -235, -244, -250, -253,
+    -255, -253, -250, -244, -235, -224, -212, -197,
+    -180, -161, -141, -120,  -97,  -74,  -49,  -24
+};
+
+// for (int i = 0; i < 64; i++)
+//     printf("%d, ", 256 - (i + 1) * 8);
+static int16_t vibrato_tremolo_wave_ramp[64] = {
+     248,  240,  232,  224,  216,  208,  200,  192,
+     184,  176,  168,  160,  152,  144,  136,  128,
+     120,  112,  104,   96,   88,   80,   72,   64,
+      56,   48,   40,   32,   24,   16,    8,    0,
+      -8,  -16,  -24,  -32,  -40,  -48,  -56,  -64,
+     -72,  -80,  -88,  -96, -104, -112, -120, -128,
+    -136, -144, -152, -160, -168, -176, -184, -192,
+    -200, -208, -216, -224, -232, -240, -248, -256
+};
+
+// for (int i = 0; i < 64; i++)
+//     printf("%d, ", i < 32 ? 255 : -255);
+static int16_t vibrato_tremolo_wave_square[64] = {
+     255,  255,  255,  255,  255,  255,  255,  255,
+     255,  255,  255,  255,  255,  255,  255,  255,
+     255,  255,  255,  255,  255,  255,  255,  255,
+     255,  255,  255,  255,  255,  255,  255,  255,
+    -255, -255, -255, -255, -255, -255, -255, -255,
+    -255, -255, -255, -255, -255, -255, -255, -255,
+    -255, -255, -255, -255, -255, -255, -255, -255,
+    -255, -255, -255, -255, -255, -255, -255, -255
+};
+
+// for (int i = 0; i < 64; i++)
+//     printf("%d, ", (rand() & 511) - 256);
+static int16_t vibrato_tremolo_wave_random[64] = {
+     103,  198, -151, -141, -175,   -1, -182,  -20,
+      41,  -51,  -70,  171,  242,   -5,  227,   70,
+    -132,  -62, -172,  248,   27,  232,  231,  141,
+     118,   90,   46, -157, -205,  159,  -55,  154,
+     102,   50, -243,  183, -207, -168,  -93,   90,
+      37,   93,    5,   23, -168,  -23, -162,  -44,
+     171,  -78,  -51,  -58, -101,  -76, -172, -239,
+    -242,  130, -140, -191,   33,   61,  220, -121
+};
 
 void ModChannelReset(int channel)
 {
@@ -162,17 +219,6 @@ static uint64_t ModGetSampleTickPeriodFromAmigaPeriod(uint32_t amiga_period)
 
     return sample_tick_period;
 }
-
-static int16_t vibrato_tremolo_sine_wave[64] = {
-       0,   24,   49,   74,   97,  120,  141,  161,
-     180,  197,  212,  224,  235,  244,  250,  253,
-     255,  253,  250,  244,  235,  224,  212,  197,
-     180,  161,  141,  120,   97,   74,   49,   24,
-       0,  -24,  -49,  -74,  -97, -120, -141, -161,
-    -180, -197, -212, -224, -235, -244, -250, -253,
-    -255, -253, -250, -244, -235, -224, -212, -197,
-    -180, -161, -141, -120,  -97,  -74,  -49,  -24
-};
 
 static uint32_t ModChannelAllocateMixer(mod_channel_info *mod_ch)
 {
@@ -374,9 +420,20 @@ void ModChannelSetEffect(int channel, int effect, int effect_params, int note)
             mod_ch->porta_to_note_speed = effect_params;
         }
     }
+    else if ((effect == EFFECT_VIBRATO) || (effect == EFFECT_VIBRATO_VOL_SLIDE))
+    {
+        if ((note >= 0) && (mod_ch->vibrato_retrigger != 0))
+            mod_ch->vibrato_tick = 0;
+
+        if (effect == EFFECT_VIBRATO)
+        {
+            if (effect_params != 0)
+                mod_ch->vibrato_args = effect_params;
+        }
+    }
     else if (effect == EFFECT_TREMOLO)
     {
-        if (note != 0)
+        if ((note >= 0) && (mod_ch->tremolo_retrigger != 0))
             mod_ch->tremolo_tick = 0;
 
         if (effect_params != 0)
@@ -385,6 +442,40 @@ void ModChannelSetEffect(int channel, int effect, int effect_params, int note)
     else if (effect == EFFECT_RETRIG_NOTE)
     {
         mod_ch->retrig_tick = 0;
+    }
+    else if (effect == EFFECT_VIBRATO_WAVEFORM)
+    {
+        mod_ch->vibrato_retrigger = 1;
+        if (effect_params & (1 << 2))
+            mod_ch->vibrato_retrigger = 0;
+
+        effect_params &= 3;
+
+        if (effect_params == 0)
+            mod_ch->vibrato_wave_table = &vibrato_tremolo_wave_sine[0];
+        else if (effect_params == 1)
+            mod_ch->vibrato_wave_table = &vibrato_tremolo_wave_ramp[0];
+        else if (effect_params == 2)
+            mod_ch->vibrato_wave_table = &vibrato_tremolo_wave_square[0];
+        else if (effect_params == 3)
+            mod_ch->vibrato_wave_table = &vibrato_tremolo_wave_random[0];
+    }
+    else if (effect == EFFECT_TREMOLO_WAVEFORM)
+    {
+        mod_ch->tremolo_retrigger = 1;
+        if (effect_params & (1 << 2))
+            mod_ch->tremolo_retrigger = 0;
+
+        effect_params &= 3;
+
+        if (effect_params == 0)
+            mod_ch->tremolo_wave_table = &vibrato_tremolo_wave_sine[0];
+        else if (effect_params == 1)
+            mod_ch->tremolo_wave_table = &vibrato_tremolo_wave_ramp[0];
+        else if (effect_params == 2)
+            mod_ch->tremolo_wave_table = &vibrato_tremolo_wave_square[0];
+        else if (effect_params == 3)
+            mod_ch->tremolo_wave_table = &vibrato_tremolo_wave_random[0];
     }
 
     // TODO
@@ -551,7 +642,7 @@ void ModChannelUpdateAllTick(int tick_number)
 
                 ch->tremolo_tick = (ch->tremolo_tick + speed) & 63;
 
-                int sine = vibrato_tremolo_sine_wave[ch->tremolo_tick];
+                int sine = ch->tremolo_wave_table[ch->tremolo_tick];
 
                 // Divide by 64, but multiply by 4 (Volume goes from 0 to 255,
                 // but it goes from 0 to 64 in the MOD format).
@@ -583,19 +674,14 @@ void ModChannelUpdateAllTick(int tick_number)
         if ((ch->effect == EFFECT_VIBRATO) ||
             (ch->effect == EFFECT_VIBRATO_VOL_SLIDE))
         {
-            if ((tick_number == 0) && (ch->effect == EFFECT_VIBRATO))
-            {
-                if (ch->effect_params != 0)
-                    ch->vibrato_args = ch->effect_params;
-            }
-            else if (tick_number > 0)
+            if (tick_number > 0)
             {
                 int speed = ch->vibrato_args >> 4;
                 int depth = ch->vibrato_args & 0xF;
 
                 ch->vibrato_tick = (ch->vibrato_tick + speed) & 63;
 
-                int sine = vibrato_tremolo_sine_wave[ch->vibrato_tick];
+                int sine = ch->vibrato_wave_table[ch->vibrato_tick];
 
                 int value = (sine * depth) >> 7; // Divide by 128
 

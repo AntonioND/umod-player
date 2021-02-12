@@ -54,8 +54,14 @@ test_mod_wav("speed.mod")
 # for 7xy to ondulate around.
 test_mod_wav("tremolo.mod")
 
+# Test all possible valid values of effect E7x, even the invalid value E78.
+test_mod_wav("tremolo_waveform.mod")
+
 # Tests effects 4xy and 6xy.
 test_mod_wav("vibrato.mod")
+
+# Test all possible valid values of effect E4x, even the invalid value E48.
+test_mod_wav("vibrato_waveform.mod")
 
 # Test Cxy effect. Test that ECx effect sets the volume to 0 and the channel can
 # be made to sound again with a Cxy effect. Also, test samples with different

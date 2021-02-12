@@ -150,6 +150,13 @@ int UMOD_PlaySong(uint32_t index)
 
     ReloadPatternData();
 
+    // Reset waveforms of vibrato and tremolo effects
+    for (int c = 0; c < MOD_CHANNELS_MAX; c++)
+    {
+        ModChannelSetEffect(c, EFFECT_VIBRATO_WAVEFORM, 0, -1);
+        ModChannelSetEffect(c, EFFECT_TREMOLO_WAVEFORM, 0, -1);
+    }
+
     loaded_song.playing = 1;
 
     return 0;

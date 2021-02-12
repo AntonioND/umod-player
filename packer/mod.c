@@ -450,6 +450,32 @@ int add_mod(const char *path)
                                 converted_effect_param = effect_params;
                                 break;
                             }
+                            case 0x4: // Vibrato waveform
+                            {
+                                if (effect_params > 8)
+                                {
+                                    printf("Effect EC4 (Vibrato Waveform): Invalid param: %d",
+                                           effect_params);
+                                    effect_params = 0;
+                                }
+
+                                converted_effect = EFFECT_VIBRATO_WAVEFORM;
+                                converted_effect_param = effect_params;
+                                break;
+                            }
+                            case 0x7: // Tremolo waveform
+                            {
+                                if (effect_params > 8)
+                                {
+                                    printf("Effect EC7 (Tremolo Waveform): Invalid param: %d",
+                                           effect_params);
+                                    effect_params = 0;
+                                }
+
+                                converted_effect = EFFECT_TREMOLO_WAVEFORM;
+                                converted_effect_param = effect_params;
+                                break;
+                            }
                             case 0x8: // 16 pos panning
                             {
                                 // Input:    0x0 = left, 0xF = right
@@ -492,10 +518,8 @@ int add_mod(const char *path)
                                 break;
 
                             case 0x3: // Glissando control
-                            case 0x4: // Vibrato waveform
                             case 0x5: // Set finetune
                             case 0x6: // Pattern loop
-                            case 0x7: // Tremolo waveform
                             case 0xD: // Delay note
                             case 0xE: // Pattern delay
                             default:

@@ -11,6 +11,12 @@ test_mod_wav("arpeggio.mod")
 # or Dxy).
 test_mod_wav("cut_note.mod")
 
+# Test of behaviour in the following cases:
+# - No instrument number, only note and effect.
+# - No note, only instrument number and effect.
+# - Only note, no instrument or effect
+test_mod_wav("empty_fields.mod")
+
 # Test effect Bxy and some corner cases like having it twice in the same row.
 test_mod_wav("jump_to_pattern.mod")
 

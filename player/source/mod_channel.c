@@ -34,6 +34,8 @@ typedef struct {
     int         tremolo_tick;
     int         tremolo_args;
 
+    int         retrig_tick;
+
     int32_t     porta_to_note_target_amiga_period;
     int         porta_to_note_speed;
 
@@ -380,6 +382,10 @@ void ModChannelSetEffect(int channel, int effect, int effect_params, int note)
         if (effect_params != 0)
             mod_ch->tremolo_args = effect_params;
     }
+    else if (effect == EFFECT_RETRIG_NOTE)
+    {
+        mod_ch->retrig_tick = 0;
+    }
 
     // TODO
 }
@@ -562,6 +568,16 @@ void ModChannelUpdateAllTick(int tick_number)
             }
 
             continue;
+        }
+        else if (ch->effect == EFFECT_RETRIG_NOTE)
+        {
+            if (ch->retrig_tick >= ch->effect_params)
+            {
+                ch->retrig_tick = 0;
+                MixerChannelSetSampleOffset(handle, 0);
+            }
+
+            ch->retrig_tick++;
         }
 
         if ((ch->effect == EFFECT_VIBRATO) ||

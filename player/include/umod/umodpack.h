@@ -70,6 +70,7 @@ typedef struct {
 #define EFFECT_VIBRATO              16
 #define EFFECT_VIBRATO_VOL_SLIDE    17
 #define EFFECT_TREMOLO              18
+#define EFFECT_RETRIG_NOTE          19
 // TODO: Reorder effect numbers
 
 #endif // UMOD_UMODPACK_H__

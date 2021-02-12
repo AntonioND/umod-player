@@ -32,6 +32,10 @@ test_mod_wav("pattern_break.mod")
 # Tests full range of notes from C-3 to B-8.
 test_mod_wav("range_test.mod")
 
+# Tests effect E9x, including corner cases such as x = 0, x = speed -1,
+# x = speed and x = speed + 1.
+test_mod_wav("retrigger_note.mod")
+
 # Tests behaviour of effect 9xy, both for samples that loop and that don't.
 test_mod_wav("sample_offset.mod")
 

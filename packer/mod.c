@@ -458,6 +458,12 @@ int add_mod(const char *path)
                                 converted_effect_param = (effect_params * 255) / 15;
                                 break;
                             }
+                            case 0x9: // Retrig note
+                            {
+                                converted_effect = EFFECT_RETRIG_NOTE;
+                                converted_effect_param = effect_params;
+                                break;
+                            }
                             case 0xA: // Fine volume slide up
                             {
                                 int value = effect_params * MOD_VOLUME_SCALE;
@@ -490,7 +496,6 @@ int add_mod(const char *path)
                             case 0x5: // Set finetune
                             case 0x6: // Pattern loop
                             case 0x7: // Tremolo waveform
-                            case 0x9: // Retrig note
                             case 0xD: // Delay note
                             case 0xE: // Pattern delay
                             default:

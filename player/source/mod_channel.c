@@ -19,7 +19,7 @@ typedef struct {
 
     int         volume;
 
-    void       *instrument_pointer;
+    umodpack_instrument    *instrument_pointer;
 
     int         panning; // 0...255 = left...right
 
@@ -198,8 +198,12 @@ void ModChannelSetNote(int channel, int note)
         MixerChannelSetInstrument(handle, mod_ch->instrument_pointer);
         MixerChannelSetVolume(handle, mod_ch->volume);
 
-        // TODO: Finetune (either default from sample, or current one of effect)
-        uint64_t period = ModGetSampleTickPeriod(mod_ch->note, 0);
+        int finetune = 0;
+        if (mod_ch->instrument_pointer != NULL)
+            finetune = mod_ch->instrument_pointer->finetune;
+
+        // TODO: Finetune from effect
+        uint64_t period = ModGetSampleTickPeriod(mod_ch->note, finetune);
         MixerChannelSetNotePeriod(handle, period);
 
         uint32_t amiga_period = ModNoteToAmigaPeriod(mod_ch->note, 0);
@@ -209,8 +213,12 @@ void ModChannelSetNote(int channel, int note)
     {
         handle = mod_ch->mixer_channel_handle;
 
-        // TODO: Finetune (either default from sample, or current one of effect)
-        uint64_t period = ModGetSampleTickPeriod(note, 0);
+        int finetune = 0;
+        if (mod_ch->instrument_pointer != NULL)
+            finetune = mod_ch->instrument_pointer->finetune;
+
+        // TODO: Finetune from effect
+        uint64_t period = ModGetSampleTickPeriod(note, finetune);
         MixerChannelSetNotePeriod(handle, period);
 
         uint32_t amiga_period = ModNoteToAmigaPeriod(note, 0);
@@ -235,8 +243,12 @@ void ModChannelSetVolume(int channel, int volume)
         MixerChannelSetInstrument(handle, mod_ch->instrument_pointer);
         MixerChannelSetVolume(handle, mod_ch->volume);
 
-        // TODO: Finetune (either default from sample, or current one of effect)
-        uint64_t period = ModGetSampleTickPeriod(mod_ch->note, 0);
+        int finetune = 0;
+        if (mod_ch->instrument_pointer != NULL)
+            finetune = mod_ch->instrument_pointer->finetune;
+
+        // TODO: Finetune from effect
+        uint64_t period = ModGetSampleTickPeriod(mod_ch->note, finetune);
         MixerChannelSetNotePeriod(handle, period);
 
         uint32_t amiga_period = ModNoteToAmigaPeriod(mod_ch->note, 0);
@@ -267,8 +279,12 @@ void ModChannelSetInstrument(int channel, void *instrument_pointer)
         MixerChannelSetInstrument(handle, mod_ch->instrument_pointer);
         MixerChannelSetVolume(handle, mod_ch->volume);
 
-        // TODO: Finetune (either default from sample, or current one of effect)
-        uint64_t period = ModGetSampleTickPeriod(mod_ch->note, 0);
+        int finetune = 0;
+        if (mod_ch->instrument_pointer != NULL)
+            finetune = mod_ch->instrument_pointer->finetune;
+
+        // TODO: Finetune from effect
+        uint64_t period = ModGetSampleTickPeriod(mod_ch->note, finetune);
         MixerChannelSetNotePeriod(handle, period);
 
         uint32_t amiga_period = ModNoteToAmigaPeriod(mod_ch->note, 0);
@@ -295,8 +311,12 @@ void ModChannelSetEffect(int channel, int effect, int effect_params, int note)
         MixerChannelSetInstrument(handle, mod_ch->instrument_pointer);
         MixerChannelSetVolume(handle, mod_ch->volume);
 
-        // TODO: Finetune (either default from sample, or current one of effect)
-        uint64_t period = ModGetSampleTickPeriod(mod_ch->note, 0);
+        int finetune = 0;
+        if (mod_ch->instrument_pointer != NULL)
+            finetune = mod_ch->instrument_pointer->finetune;
+
+        // TODO: Finetune from effect
+        uint64_t period = ModGetSampleTickPeriod(mod_ch->note, finetune);
         MixerChannelSetNotePeriod(handle, period);
 
         uint32_t amiga_period = ModNoteToAmigaPeriod(mod_ch->note, 0);
@@ -312,9 +332,12 @@ void ModChannelSetEffect(int channel, int effect, int effect_params, int note)
         {
             uint32_t handle = mod_ch->mixer_channel_handle;
 
-            // TODO: Finetune (either default from sample, or current one of
-            // effect).
-            uint64_t period = ModGetSampleTickPeriod(mod_ch->note, 0);
+            int finetune = 0;
+            if (mod_ch->instrument_pointer != NULL)
+                finetune = mod_ch->instrument_pointer->finetune;
+
+            // TODO: Finetune from effect
+            uint64_t period = ModGetSampleTickPeriod(mod_ch->note, finetune);
             MixerChannelSetNotePeriod(handle, period);
 
             uint32_t amiga_period = ModNoteToAmigaPeriod(mod_ch->note, 0);
@@ -401,8 +424,12 @@ void ModChannelUpdateAllTick(int tick_number)
                 ch->arpeggio_tick = 0;
             }
 
-            // TODO: Finetune
-            uint64_t period = ModGetSampleTickPeriod(note, 0);
+            int finetune = 0;
+            if (ch->instrument_pointer != NULL)
+                finetune = ch->instrument_pointer->finetune;
+
+            // TODO: Finetune from effect
+            uint64_t period = ModGetSampleTickPeriod(note, finetune);
             MixerChannelSetNotePeriod(ch->mixer_channel_handle, period);
 
             uint32_t amiga_period = ModNoteToAmigaPeriod(note, 0);

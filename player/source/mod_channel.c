@@ -288,9 +288,6 @@ void ModChannelSetEffect(int channel, int effect, int effect_params, int note)
 
     mod_channel_info *mod_ch = &mod_channel[channel];
 
-    mod_ch->effect = effect;
-    mod_ch->effect_params = effect_params;
-
     if (mod_ch->mixer_channel_handle == MIXER_HANDLE_INVALID)
     {
         uint32_t handle = ModChannelAllocateMixer(mod_ch);
@@ -306,6 +303,28 @@ void ModChannelSetEffect(int channel, int effect, int effect_params, int note)
         mod_ch->amiga_period = amiga_period;
     }
 
+    if ((mod_ch->effect == EFFECT_ARPEGGIO) && (effect != EFFECT_ARPEGGIO))
+    {
+        // Make sure that after an arpeggio effect, if there is no new arpeggio
+        // effect, the note always goes back to the base frequency. This happens
+        // only if no new note has been specified.
+        if (note < 0)
+        {
+            uint32_t handle = mod_ch->mixer_channel_handle;
+
+            // TODO: Finetune (either default from sample, or current one of
+            // effect).
+            uint64_t period = ModGetSampleTickPeriod(mod_ch->note, 0);
+            MixerChannelSetNotePeriod(handle, period);
+
+            uint32_t amiga_period = ModNoteToAmigaPeriod(mod_ch->note, 0);
+            mod_ch->amiga_period = amiga_period;
+        }
+    }
+
+    mod_ch->effect = effect;
+    mod_ch->effect_params = effect_params;
+
     if (effect == EFFECT_NONE)
     {
         return;
@@ -318,8 +337,7 @@ void ModChannelSetEffect(int channel, int effect, int effect_params, int note)
     }
     else if (effect == EFFECT_ARPEGGIO)
     {
-        if (note != 0) // ???
-            mod_ch->arpeggio_tick = 0;
+        mod_ch->arpeggio_tick = 0;
     }
     else if (effect == EFFECT_PORTA_TO_NOTE)
     {

@@ -2,7 +2,9 @@
 #
 # Copyright (c) 2021 Antonio Niño Díaz
 
-# Test effect 0xx, including 000, which is a "no effect" effect.
+# Test effect 0xx, including 000, which is a "no effect" effect. Also, test
+# arpeggios when the song speed is too fast and the second note of the arpeggio
+# (or the first one) can't happen.
 test_mod_wav("arpeggio.mod")
 
 # Test ECx including some corner cases (like EC0, or ECx at the same time as Bxy

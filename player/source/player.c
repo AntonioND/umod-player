@@ -271,7 +271,7 @@ static void UMOD_Tick(void)
 
         if (effect == -1)
         {
-            ModChannelSetEffect(c, EFFECT_NONE, 0, 0);
+            ModChannelSetEffect(c, EFFECT_NONE, 0, -1);
         }
         else
         {

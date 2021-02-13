@@ -433,11 +433,13 @@ int add_mod(const char *path)
                         switch (effect_number)
                         {
                             case 0x0: // Set filter
+                            {
                                 printf("Effect not supported: E0x (Set Filter)\n");
                                 // For now there is no intention of implementing
                                 // this effect in the future, as it has to do
                                 // with a hardware filter of the Amiga.
                                 break;
+                            }
                             case 0x1: // Fine porta up
                             {
                                 converted_effect = EFFECT_FINE_PORTA_UP;
@@ -454,7 +456,7 @@ int add_mod(const char *path)
                             {
                                 if (effect_params > 8)
                                 {
-                                    printf("Effect EC4 (Vibrato Waveform): Invalid param: %d",
+                                    printf("Effect EC4 (Vibrato Waveform): Invalid param: %d\n",
                                            effect_params);
                                     effect_params = 0;
                                 }
@@ -467,7 +469,7 @@ int add_mod(const char *path)
                             {
                                 if (effect_params > 8)
                                 {
-                                    printf("Effect EC7 (Tremolo Waveform): Invalid param: %d",
+                                    printf("Effect EC7 (Tremolo Waveform): Invalid param: %d\n",
                                            effect_params);
                                     effect_params = 0;
                                 }
@@ -511,11 +513,13 @@ int add_mod(const char *path)
                                 break;
                             }
                             case 0xF: // Invert loop
+                            {
                                 printf("Effect not supported: EFx (Invert Loop)\n");
                                 // For now there is no intention of implementing
                                 // this effect in the future, unless there are
                                 // songs that actually use it.
                                 break;
+                            }
 
                             case 0x3: // Glissando control
                             case 0x5: // Set finetune
@@ -523,9 +527,11 @@ int add_mod(const char *path)
                             case 0xD: // Delay note
                             case 0xE: // Pattern delay
                             default:
+                            {
                                 printf("Effect not supported: E%X%X\n",
                                        effect_number, effect_params);
                                 break;
+                            }
                         }
                         break;
                     }
@@ -540,9 +546,11 @@ int add_mod(const char *path)
                         break;
                     }
                     default:
+                    {
                         printf("Effect not supported: %X%02X\n",
                                effect_number, effect_params);
                         break;
+                    }
                 }
 
                 int instrument = -1;

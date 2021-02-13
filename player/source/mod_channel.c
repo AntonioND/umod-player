@@ -669,6 +669,8 @@ void ModChannelUpdateAllTick(int tick_number)
             }
 
             ch->retrig_tick++;
+
+            continue;
         }
 
         if ((ch->effect == EFFECT_VIBRATO) ||

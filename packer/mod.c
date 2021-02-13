@@ -512,6 +512,17 @@ int add_mod(const char *path)
                                 converted_effect_param = effect_params;
                                 break;
                             }
+                            case 0xD: // Delay note
+                            {
+                                if (effect_params == 0)
+                                {
+                                    printf("Effect ED0 (Delay Note): Invalid param: 0\n");
+                                    break;
+                                }
+                                converted_effect = EFFECT_DELAY_NOTE;
+                                converted_effect_param = effect_params;
+                                break;
+                            }
                             case 0xF: // Invert loop
                             {
                                 printf("Effect not supported: EFx (Invert Loop)\n");
@@ -524,7 +535,6 @@ int add_mod(const char *path)
                             case 0x3: // Glissando control
                             case 0x5: // Set finetune
                             case 0x6: // Pattern loop
-                            case 0xD: // Delay note
                             case 0xE: // Pattern delay
                             default:
                             {

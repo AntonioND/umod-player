@@ -73,6 +73,7 @@ typedef struct {
 #define EFFECT_RETRIG_NOTE          19
 #define EFFECT_VIBRATO_WAVEFORM     20
 #define EFFECT_TREMOLO_WAVEFORM     21
+#define EFFECT_DELAY_NOTE           22
 // TODO: Reorder effect numbers
 
 #endif // UMOD_UMODPACK_H__

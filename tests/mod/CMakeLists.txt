@@ -11,6 +11,10 @@ test_mod_wav("arpeggio.mod")
 # or Dxy).
 test_mod_wav("cut_note.mod")
 
+# Test EDx including some corner cases, like ED0, or EDx when the value is the
+# same as the speed of the song, or just around it.
+test_mod_wav("delay_note.mod")
+
 # Test of behaviour in the following cases:
 # - No instrument number, only note and effect.
 # - No note, only instrument number and effect.

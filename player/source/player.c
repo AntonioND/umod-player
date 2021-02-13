@@ -256,6 +256,19 @@ static void UMOD_Tick(void)
             effect_params = *loaded_song.pattern_position++;
         }
 
+        if (effect == EFFECT_DELAY_NOTE)
+        {
+            void *instrument_pointer = NULL;
+            if (instrument != -1)
+                instrument_pointer = InstrumentGetPointer(instrument);
+
+            ModChannelSetEffectDelayNote(c, effect_params, note, volume,
+                                         instrument_pointer);
+            continue;
+        }
+
+        // This is only reached if the effect isn't Delay Note
+
         if (instrument != -1)
         {
             void *instrument_pointer = InstrumentGetPointer(instrument);

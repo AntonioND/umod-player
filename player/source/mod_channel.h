@@ -12,6 +12,8 @@ void ModChannelSetNote(int channel, int note);
 void ModChannelSetVolume(int channel, int volume);
 void ModChannelSetInstrument(int channel, void *instrument_pointer);
 void ModChannelSetEffect(int channel, int effect, int effect_params, int note);
+void ModChannelSetEffectDelayNote(int channel, int effect_params, int note,
+                                  int volume, void *instrument);
 void ModChannelUpdateAllTick(int tick_number);
 void ModChannelUpdateAllRow(void);
 

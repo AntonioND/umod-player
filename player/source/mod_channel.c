@@ -45,6 +45,10 @@ typedef struct {
     int16_t    *tremolo_wave_table;
     int         tremolo_retrigger;
 
+    int                     delayed_note;
+    int                     delayed_volume;
+    umodpack_instrument    *delayed_instrument;
+
     uint32_t    sample_offset; // Used for "Set Offset" effect
 
     uint32_t    mixer_channel_handle;
@@ -344,6 +348,20 @@ void ModChannelSetInstrument(int channel, void *instrument_pointer)
 
         MixerChannelSetInstrument(handle, mod_ch->instrument_pointer);
     }
+}
+
+void ModChannelSetEffectDelayNote(int channel, int effect_params, int note,
+                                  int volume, void *instrument)
+{
+    assert(channel < MOD_CHANNELS_MAX);
+
+    mod_channel_info *mod_ch = &mod_channel[channel];
+
+    mod_ch->effect = EFFECT_DELAY_NOTE;
+    mod_ch->effect_params = effect_params;
+    mod_ch->delayed_note = note;
+    mod_ch->delayed_volume = volume;
+    mod_ch->delayed_instrument = instrument;
 }
 
 void ModChannelSetEffect(int channel, int effect, int effect_params, int note)
@@ -669,6 +687,24 @@ void ModChannelUpdateAllTick(int tick_number)
             }
 
             ch->retrig_tick++;
+
+            continue;
+        }
+        else if (ch->effect == EFFECT_DELAY_NOTE)
+        {
+            if (ch->effect_params == tick_number)
+            {
+                if (ch->delayed_instrument != NULL)
+                    ModChannelSetInstrument(c, ch->delayed_instrument);
+
+                if (ch->delayed_note != -1)
+                    ModChannelSetNote(c, ch->delayed_note);
+
+                if (ch->delayed_volume != -1)
+                    ModChannelSetVolume(c, ch->delayed_volume);
+
+                ch->effect = EFFECT_NONE;
+            }
 
             continue;
         }

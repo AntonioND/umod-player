@@ -78,6 +78,13 @@ int save_pack(const char *path)
             uint8_t val = data[p];
             fwrite(&val, sizeof(val), 1, f);
         }
+
+        // Align next element to 32 bit
+        {
+            long align = (4 - (ftell(f) & 3)) & 3;
+            uint8_t val = 0;
+            fwrite(&val, sizeof(val), align, f);
+        }
     }
 
     // Write patterns
@@ -139,6 +146,13 @@ int save_pack(const char *path)
                 }
             }
         }
+
+        // Align next element to 32 bit
+        {
+            long align = (4 - (ftell(f) & 3)) & 3;
+            uint8_t val = 0;
+            fwrite(&val, sizeof(val), align, f);
+        }
     }
 
     // Write instruments
@@ -174,6 +188,13 @@ int save_pack(const char *path)
         {
             int8_t sample = data[j];
             fwrite(&sample, sizeof(sample), 1, f);
+        }
+
+        // Align next element to 32 bit
+        {
+            long align = (4 - (ftell(f) & 3)) & 3;
+            uint8_t val = 0;
+            fwrite(&val, sizeof(val), align, f);
         }
     }
 

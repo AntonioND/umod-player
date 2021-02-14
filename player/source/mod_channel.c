@@ -206,6 +206,10 @@ static uint64_t ModGetSampleTickPeriod(int note_index, int finetune)
     //                                                Sample Rate * 2
     //   Period (Sample) = (Amiga Period [Octave 0] * ---------------) >> octave
     //                                                   7159090.5
+    //
+    //   As the returned value needs to be 32.32 fixed point:
+    //
+    //   Period (Sample) [Fixed Point] = Period (Sample) << 32
 
     const uint64_t constant = (((uint64_t)UMOD_SAMPLE_RATE * 2) << 32) / 7159090.5;
 

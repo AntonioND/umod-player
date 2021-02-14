@@ -11,12 +11,12 @@
 #include "mixer_channel.h"
 
 typedef struct {
-    int volume;
-    int left_panning; // 0...255
-    int right_panning; // 0...255
+    int volume;         // 0...255
+    int left_panning;   // 0...255
+    int right_panning;  // 0...255
 
-    int left_volume; // combined volume * left_panning
-    int right_volume; // combined volume * right_panning
+    int left_volume;    // volume * left_panning = 0...65535
+    int right_volume;   // volume * right_panning = 0...65535
 
 #define STATE_STOP 0
 #define STATE_PLAY 1

@@ -166,6 +166,13 @@ static uint32_t ModNoteToAmigaPeriod(int note_index, int finetune)
     return amiga_period;
 }
 
+static uint64_t convert_constant;
+
+void ModSetSampleRateConvertConstant(uint32_t sample_rate)
+{
+    convert_constant = ((uint64_t)sample_rate << 34) / 14318181;
+}
+
 // Returns the number of ticks needed to increase the sample read pointer in an
 // instrument. For example, if it returns 4.5, the pointer in the instrument
 // must be increased after every 4.5 samples that the global mixer generates.
@@ -207,13 +214,19 @@ static uint64_t ModGetSampleTickPeriod(int note_index, int finetune)
     //   Period (Sample) = (Amiga Period [Octave 0] * ---------------) >> octave
     //                                                   7159090.5
     //
+    //                                                Sample Rate * 4
+    //   Period (Sample) = (Amiga Period [Octave 0] * ---------------) >> octave
+    //                                                    14318181
+    //
     //   As the returned value needs to be 32.32 fixed point:
     //
     //   Period (Sample) [Fixed Point] = Period (Sample) << 32
+    //
+    //                                                Sample Rate << 34
+    //   Period (Sample) = (Amiga Period [Octave 0] * -----------------) >> octave
+    //                                                    14318181
 
-    const uint64_t constant = (((uint64_t)UMOD_SAMPLE_RATE * 2) << 32) / 7159090.5;
-
-    uint64_t sample_tick_period = (amiga_period * constant) >> octave;
+    uint64_t sample_tick_period = (amiga_period * convert_constant) >> octave;
 
     return sample_tick_period;
 }
@@ -221,9 +234,7 @@ static uint64_t ModGetSampleTickPeriod(int note_index, int finetune)
 ARM_CODE
 static uint64_t ModGetSampleTickPeriodFromAmigaPeriod(uint32_t amiga_period)
 {
-    const uint64_t constant = (((uint64_t)UMOD_SAMPLE_RATE * 2) << 32) / 7159090.5;
-
-    uint64_t sample_tick_period = amiga_period * constant;
+    uint64_t sample_tick_period = amiga_period * convert_constant;
 
     return sample_tick_period;
 }

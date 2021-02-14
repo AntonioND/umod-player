@@ -7,6 +7,8 @@
 
 #define MOD_CHANNELS_MAX    16
 
+void ModSetSampleRateConvertConstant(uint32_t sample_rate);
+
 void ModChannelResetAll(void);
 void ModChannelSetNote(int channel, int note);
 void ModChannelSetVolume(int channel, int volume);

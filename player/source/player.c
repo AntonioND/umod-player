@@ -25,6 +25,15 @@ typedef struct {
 
 static umod_loaded_pack loaded_pack;
 
+static uint32_t global_sample_rate;
+
+void UMOD_Init(uint32_t sample_rate)
+{
+    global_sample_rate = sample_rate;
+
+    ModSetSampleRateConvertConstant(sample_rate);
+}
+
 int UMOD_LoadPack(const void *pack)
 {
     const umodpack_header *header = pack;
@@ -108,7 +117,7 @@ static void SetSpeed(int speed)
     {
         // Default is 125 BPM -> 50 Hz
         int hz = (2 * speed) / 5;
-        loaded_song.samples_per_tick = UMOD_SAMPLE_RATE / hz;
+        loaded_song.samples_per_tick = global_sample_rate / hz;
         loaded_song.samples_left_for_tick = loaded_song.samples_per_tick;
     }
     else

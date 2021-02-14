@@ -10,6 +10,8 @@
 #include "file.h"
 #include "wav_utils.h"
 
+#define SAMPLE_RATE (32 * 1024)
+
 int main(int argc, char *argv[])
 {
     if (argc != 3)
@@ -29,10 +31,12 @@ int main(int argc, char *argv[])
 
     // Play music until the song ends, while saving it to a WAV
 
+    UMOD_Init(SAMPLE_RATE);
+
     UMOD_LoadPack(pack_buffer);
     UMOD_PlaySong(0);
 
-    WAV_FileStart(argv[2], 32 * 1024);
+    WAV_FileStart(argv[2], SAMPLE_RATE);
     if (!WAV_FileIsOpen())
         goto cleanup;
 
@@ -40,7 +44,7 @@ int main(int argc, char *argv[])
 
     while (UMOD_IsPlayingSong())
     {
-#define SIZE ((32 * 1024) / 60)
+#define SIZE (SAMPLE_RATE / 60)
         uint8_t left[SIZE], right[SIZE];
         UMOD_Mix(&left[0], &right[0], SIZE);
 

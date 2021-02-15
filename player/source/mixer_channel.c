@@ -299,13 +299,27 @@ void MixerMix(uint8_t *left_buffer, uint8_t *right_buffer, size_t buffer_size)
             }
         }
 
-        // Total = number of channels * (value * volume * panning)
-        // It is needed to divide between number of channels * max volume * max
-        // panning
+        // Total = sample * number of channels * volume * panning
+        //       -128...127         8            0...255  0...255
+        //
+        // The result needs to be scaled down and clamped to -128...127
+        //
+        // Divide by volume, panning first. Then, divide by a number smaller
+        // than the number of channels. 4 seems to be a good number to keep the
+        // volume up.
 
-        static_assert(MIXER_CHANNELS_MAX == (1 << 3));
-        total_left >>= 3 + 8 + 8;
-        total_right >>= 3 + 8 + 8;
+        static_assert(MIXER_CHANNELS_MAX == 8);
+        total_left >>= 2 + 8 + 8;  // 4 * max volume * max panning
+        total_right >>= 2 + 8 + 8; // 4 * max volume * max panning
+
+        if (total_left < -128)
+            total_left = -128;
+        if (total_right < -128)
+            total_right = -128;
+        if (total_left > 127)
+            total_left = 127;
+        if (total_right > 127)
+            total_right = 127;
 
         *left_buffer++ = total_left;
         *right_buffer++ = total_right;

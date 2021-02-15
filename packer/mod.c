@@ -209,6 +209,7 @@ int add_mod(const char *path)
 
         printf("    %2d: Name: '%s'\n", i, instrument_name);
 
+#if 0
         if (instrument_size > 0)
         {
             printf("        Length: %zu\n", instrument_size);
@@ -217,6 +218,7 @@ int add_mod(const char *path)
             printf("        Loop point: %zu\n", instrument_loop_point);
             printf("        Loop length: %zu\n", instrument_loop_length);
         }
+#endif
 
         // Pointer to instrument data start and end
 

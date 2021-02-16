@@ -17,7 +17,7 @@ broken.
 Note that, at the moment, the only possible output from this library is a buffer
 of samples. There is a WAV file renderer that is used for the regression tests.
 
-It is licensed under the MIT license.
+This is not ready to be used in real projects yet.
 
 2. Dependencies
 ---------------
@@ -69,7 +69,25 @@ Go to folder **player** and run ``make``. Go to folder **gba_example** and run
 
 Note that the code of this example is just a proof of concept.
 
-5. Acknowledgements
+5. Licenses
+-----------
+
+All licenses used in this repository have a copy in the **licenses** folder.
+
+All code is licensed under the **MIT** license (as specified in the header of
+each source code file). This is all you need to worry about if you want to use
+the library in your own projects.
+
+All files that aren't source code are licensed under the **Creative Commons
+Attribution 4.0 International** (``SPDX-License-Identifier: CC-BY-4.0``). In
+practice, this covers all the test files in the **test** directory.
+
+The folder **tests/songs** is exempt from this license, as they are songs found
+online. Each song has a corresponding information file in the **licenses/songs**
+folder of the repository. It links to the website they were downloaded from, the
+author, and the license.
+
+6. Acknowledgements
 -------------------
 
 - Brett Paterson (FireLight) for FMODDOC.TXT
@@ -79,5 +97,7 @@ Note that the code of this example is just a proof of concept.
 - Dave Murphy (WinterMute) and others for devkitPro, devkitARM and libgba.
 - Martin Korth (Nocash) for no$gba and GBATEK.
 - Vicki Pfau (endrift) for mGBA.
+- The Mod Archive for an endless collection of songs.
+- Nightbeat, for some of the songs I've used to test this player with.
 
 .. _devkitPro: https://devkitpro.org/

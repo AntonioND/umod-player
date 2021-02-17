@@ -28,13 +28,13 @@ typedef struct {
     int play_state;
 
     struct {
-        uint8_t    *pointer; // Pointer to sample data
-        uint64_t    size;
-        uint64_t    loop_start;
-        uint64_t    loop_end;
+        uint8_t    *pointer;    // Pointer to sample data
+        uint32_t    size;       // 20.12
+        uint32_t    loop_start; // 20.12
+        uint32_t    loop_end;   // 20.12
 
-        uint64_t    position; // 32.32 Position in the sample to read from
-        uint64_t    position_inc_per_sample; // 32.32
+        uint32_t    position;   // 20.12 Position in the sample to read from
+        uint32_t    position_inc_per_sample; // 20.12
     } sample;
 
     uint32_t    handle; // Handle that was given to the owner of this channel
@@ -137,14 +137,14 @@ int MixerChannelSetSampleOffset(uint32_t handle, uint32_t offset)
 
     mixer_channel_info *ch = &mixer_channel[channel];
 
-    if (offset >= (ch->sample.size >> 32))
+    if (offset >= (ch->sample.size >> 12))
     {
         // Fail if the position is out of bounds. Stop channel.
         MixerChannelStop(handle);
         return -1;
     }
 
-    ch->sample.position = (uint64_t)offset << 32;
+    ch->sample.position = offset << 12;
 
     return 0;
 }
@@ -164,10 +164,10 @@ int MixerChannelSetNotePeriod(uint32_t handle, uint64_t period) // 32.32
         return -1;
     }
 
-    ch->sample.position = 0; // 32.32
+    ch->sample.position = 0; // 20.12
 
-    // (16.48 / 32.32) << 16 = (48.16) << 16 = 32.32
-    ch->sample.position_inc_per_sample = (((uint64_t)1 << 48) / period) << 16;
+    // 20.44 / 32.32 = 52.12 = 20.12
+    ch->sample.position_inc_per_sample = ((uint64_t)1 << 44) / period;
 
     ch->play_state = STATE_PLAY;
 
@@ -198,9 +198,9 @@ int MixerChannelSetInstrument(uint32_t handle, void *instrument_pointer)
     mixer_channel_info *ch = &mixer_channel[channel];
 
     ch->sample.pointer = pointer;
-    ch->sample.size = size << 32;
-    ch->sample.loop_start = loop_start << 32;
-    ch->sample.loop_end = loop_end << 32;
+    ch->sample.size = size << 12;
+    ch->sample.loop_start = loop_start << 12;
+    ch->sample.loop_end = loop_end << 12;
 
     return 0;
 }
@@ -273,7 +273,7 @@ void MixerMix(uint8_t *left_buffer, uint8_t *right_buffer, size_t buffer_size)
         {
             mixer_channel_info *ch = active_ch[i];
 
-            int value = ch->sample.pointer[ch->sample.position >> 32]; // -128..127
+            int value = ch->sample.pointer[ch->sample.position >> 12]; // -128..127
 
             total_left += value * ch->left_volume;
             total_right += value * ch->right_volume;

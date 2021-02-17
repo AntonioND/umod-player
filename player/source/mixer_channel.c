@@ -240,25 +240,37 @@ int MixerChannelSetPanning(uint32_t handle, int panning)
 ARM_CODE IWRAM_CODE
 void MixerMix(uint8_t *left_buffer, uint8_t *right_buffer, size_t buffer_size)
 {
-    // This function needs to mix all channels
+    // Get list of all active channels
+
+    int active_channels = 0;
+    mixer_channel_info *active_ch[MIXER_CHANNELS_MAX];
+
+    for (int channel = 0 ; channel < MIXER_CHANNELS_MAX; channel++)
+    {
+        mixer_channel_info *ch = &mixer_channel[channel];
+
+        //if ((used_channel_flags & (1 << channel)) == 0)
+        //    continue;
+
+        if (ch->play_state == STATE_STOP)
+            continue;
+
+        if (ch->sample.pointer == NULL)
+            continue;
+
+        active_ch[active_channels++] = ch;
+    }
+
+    // Mix active channels
 
     while (buffer_size > 0)
     {
         int32_t total_left = 0;
         int32_t total_right = 0;
 
-        mixer_channel_info *ch = &mixer_channel[0];
-
-        for (int channel = 0 ; channel < MIXER_CHANNELS_MAX; channel++, ch++)
+        for (int i = 0; i < active_channels; i++)
         {
-            //if ((used_channel_flags & (1 << channel)) == 0)
-            //    continue;
-
-            if (ch->play_state == STATE_STOP)
-                continue;
-
-            if (ch->sample.pointer == NULL)
-                continue;
+            mixer_channel_info *ch = active_ch[i];
 
             int value = ch->sample.pointer[ch->sample.position]; // -128..127
 
@@ -281,6 +293,14 @@ void MixerMix(uint8_t *left_buffer, uint8_t *right_buffer, size_t buffer_size)
                         {
                             ch->sample.position = 0;
                             ch->play_state = STATE_STOP;
+
+                            // Remove this channel from the list
+                            for (int j = i; j < active_channels - 1; j++)
+                                active_ch[j] = active_ch[j + 1];
+
+                            active_channels--;
+
+                            break;
                         }
                         else
                         {

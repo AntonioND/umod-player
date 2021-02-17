@@ -514,7 +514,154 @@ void ModChannelSetEffect(int channel, int effect, int effect_params, int note)
     // TODO
 }
 
-void ModChannelUpdateAllTick(int tick_number)
+// Update effects for Ticks == 0
+void ModChannelUpdateAllTick_T0(void)
+{
+    for (size_t c = 0; c < MOD_CHANNELS_MAX; c++)
+    {
+        mod_channel_info *ch = &mod_channel[c];
+
+        uint32_t handle = ch->mixer_channel_handle;
+
+        if (handle == MIXER_HANDLE_INVALID)
+            continue;
+
+        if (ch->effect == EFFECT_CUT_NOTE)
+        {
+            if (ch->effect_params == 0)
+            {
+                ch->effect = EFFECT_NONE;
+                MixerChannelSetVolume(handle, 0);
+            }
+
+            continue;
+        }
+        else if (ch->effect == EFFECT_ARPEGGIO)
+        {
+            int note = ch->note;
+
+            if (ch->arpeggio_tick == 0)
+            {
+                ch->arpeggio_tick++;
+            }
+            else if (ch->arpeggio_tick == 1)
+            {
+                note += ch->effect_params >> 4;
+                ch->arpeggio_tick++;
+            }
+            else if (ch->arpeggio_tick == 2)
+            {
+                note += ch->effect_params & 0xF;
+                ch->arpeggio_tick = 0;
+            }
+
+            int finetune = 0;
+            if (ch->instrument_pointer != NULL)
+                finetune = ch->instrument_pointer->finetune;
+
+            // TODO: Finetune from effect
+            uint64_t period = ModGetSampleTickPeriod(note, finetune);
+            MixerChannelSetNotePeriod(ch->mixer_channel_handle, period);
+
+            uint32_t amiga_period = ModNoteToAmigaPeriod(note, 0);
+            ch->amiga_period = amiga_period;
+
+            continue;
+        }
+        else if (ch->effect == EFFECT_FINE_VOLUME_SLIDE)
+        {
+            int volume = ch->volume + (int8_t)ch->effect_params;
+
+            if (volume > 255)
+                volume = 255;
+
+            if (volume < 0)
+                volume = 0;
+
+            if (volume != ch->volume)
+            {
+                ch->volume = volume;
+                MixerChannelSetVolume(handle, volume);
+            }
+
+            continue;
+        }
+        else if (ch->effect == EFFECT_FINE_PORTA_UP)
+        {
+            ch->amiga_period -= (uint8_t)ch->effect_params;
+            if (ch->amiga_period < 1)
+                ch->amiga_period = 1;
+
+            uint64_t period;
+            period = ModGetSampleTickPeriodFromAmigaPeriod(ch->amiga_period);
+            MixerChannelSetNotePeriod(ch->mixer_channel_handle, period);
+
+            continue;
+        }
+        else if (ch->effect == EFFECT_FINE_PORTA_DOWN)
+        {
+            ch->amiga_period += (uint8_t)ch->effect_params;
+
+            uint64_t period;
+            period = ModGetSampleTickPeriodFromAmigaPeriod(ch->amiga_period);
+            MixerChannelSetNotePeriod(ch->mixer_channel_handle, period);
+
+            continue;
+        }
+        else if (ch->effect == EFFECT_SAMPLE_OFFSET)
+        {
+            uint32_t offset = ch->effect_params << 8;
+
+            if (offset == 0)
+            {
+                // Reload the last value used. If this effect was used
+                // before, there will be an offset. If not, it will be 0.
+                offset = ch->sample_offset;
+            }
+            else
+            {
+                ch->sample_offset = offset;
+            }
+
+            MixerChannelSetSampleOffset(handle, offset);
+
+            continue;
+        }
+        else if (ch->effect == EFFECT_RETRIG_NOTE)
+        {
+            if (ch->retrig_tick >= ch->effect_params)
+            {
+                ch->retrig_tick = 0;
+                MixerChannelSetSampleOffset(handle, 0);
+            }
+
+            ch->retrig_tick++;
+
+            continue;
+        }
+        else if (ch->effect == EFFECT_DELAY_NOTE)
+        {
+            if (ch->effect_params == 0)
+            {
+                if (ch->delayed_instrument != NULL)
+                    ModChannelSetInstrument(c, ch->delayed_instrument);
+
+                if (ch->delayed_note != -1)
+                    ModChannelSetNote(c, ch->delayed_note);
+
+                if (ch->delayed_volume != -1)
+                    ModChannelSetVolume(c, ch->delayed_volume);
+
+                ch->effect = EFFECT_NONE;
+            }
+
+            continue;
+        }
+    }
+}
+
+// Update effects for Ticks > 0
+void ModChannelUpdateAllTick_TN(int tick_number)
 {
     for (size_t c = 0; c < MOD_CHANNELS_MAX; c++)
     {
@@ -567,129 +714,49 @@ void ModChannelUpdateAllTick(int tick_number)
 
             continue;
         }
-        else if (ch->effect == EFFECT_FINE_VOLUME_SLIDE)
-        {
-            if (tick_number == 0)
-            {
-                int volume = ch->volume + (int8_t)ch->effect_params;
-
-                if (volume > 255)
-                    volume = 255;
-
-                if (volume < 0)
-                    volume = 0;
-
-                if (volume != ch->volume)
-                {
-                    ch->volume = volume;
-                    MixerChannelSetVolume(handle, volume);
-                }
-            }
-
-            continue;
-        }
         else if (ch->effect == EFFECT_PORTA_UP)
         {
-            if (tick_number > 0)
-            {
-                ch->amiga_period -= (uint8_t)ch->effect_params;
-                if (ch->amiga_period < 1)
-                    ch->amiga_period = 1;
+            ch->amiga_period -= (uint8_t)ch->effect_params;
+            if (ch->amiga_period < 1)
+                ch->amiga_period = 1;
 
-                uint64_t period;
-                period = ModGetSampleTickPeriodFromAmigaPeriod(ch->amiga_period);
-                MixerChannelSetNotePeriod(ch->mixer_channel_handle, period);
-            }
-
-            continue;
-        }
-        else if (ch->effect == EFFECT_FINE_PORTA_UP)
-        {
-            if (tick_number == 0)
-            {
-                ch->amiga_period -= (uint8_t)ch->effect_params;
-                if (ch->amiga_period < 1)
-                    ch->amiga_period = 1;
-
-                uint64_t period;
-                period = ModGetSampleTickPeriodFromAmigaPeriod(ch->amiga_period);
-                MixerChannelSetNotePeriod(ch->mixer_channel_handle, period);
-            }
+            uint64_t period;
+            period = ModGetSampleTickPeriodFromAmigaPeriod(ch->amiga_period);
+            MixerChannelSetNotePeriod(ch->mixer_channel_handle, period);
 
             continue;
         }
         else if (ch->effect == EFFECT_PORTA_DOWN)
         {
-            if (tick_number > 0)
-            {
-                ch->amiga_period += (uint8_t)ch->effect_params;
+            ch->amiga_period += (uint8_t)ch->effect_params;
 
-                uint64_t period;
-                period = ModGetSampleTickPeriodFromAmigaPeriod(ch->amiga_period);
-                MixerChannelSetNotePeriod(ch->mixer_channel_handle, period);
-            }
-
-            continue;
-        }
-        else if (ch->effect == EFFECT_FINE_PORTA_DOWN)
-        {
-            if (tick_number == 0)
-            {
-                ch->amiga_period += (uint8_t)ch->effect_params;
-
-                uint64_t period;
-                period = ModGetSampleTickPeriodFromAmigaPeriod(ch->amiga_period);
-                MixerChannelSetNotePeriod(ch->mixer_channel_handle, period);
-            }
-
-            continue;
-        }
-        else if (ch->effect == EFFECT_SAMPLE_OFFSET)
-        {
-            if (tick_number == 0)
-            {
-                uint32_t offset = ch->effect_params << 8;
-
-                if (offset == 0)
-                {
-                    // Reload the last value used. If this effect was used
-                    // before, there will be an offset. If not, it will be 0.
-                    offset = ch->sample_offset;
-                }
-                else
-                {
-                    ch->sample_offset = offset;
-                }
-
-                MixerChannelSetSampleOffset(handle, offset);
-            }
+            uint64_t period;
+            period = ModGetSampleTickPeriodFromAmigaPeriod(ch->amiga_period);
+            MixerChannelSetNotePeriod(ch->mixer_channel_handle, period);
 
             continue;
         }
         else if (ch->effect == EFFECT_TREMOLO)
         {
-            if (tick_number > 0)
-            {
-                int speed = ch->tremolo_args >> 4;
-                int depth = ch->tremolo_args & 0xF;
+            int speed = ch->tremolo_args >> 4;
+            int depth = ch->tremolo_args & 0xF;
 
-                ch->tremolo_tick = (ch->tremolo_tick + speed) & 63;
+            ch->tremolo_tick = (ch->tremolo_tick + speed) & 63;
 
-                int sine = ch->tremolo_wave_table[ch->tremolo_tick];
+            int sine = ch->tremolo_wave_table[ch->tremolo_tick];
 
-                // Divide by 64, but multiply by 4 (Volume goes from 0 to 255,
-                // but it goes from 0 to 64 in the MOD format).
-                int value = (sine * depth) >> (6 - 2);
+            // Divide by 64, but multiply by 4 (Volume goes from 0 to 255,
+            // but it goes from 0 to 64 in the MOD format).
+            int value = (sine * depth) >> (6 - 2);
 
-                int volume = ch->volume + value;
+            int volume = ch->volume + value;
 
-                if (volume < 0)
-                    volume = 0;
-                else if (volume > 255)
-                    volume = 255;
+            if (volume < 0)
+                volume = 0;
+            else if (volume > 255)
+                volume = 255;
 
-                MixerChannelSetVolume(ch->mixer_channel_handle, volume);
-            }
+            MixerChannelSetVolume(ch->mixer_channel_handle, volume);
 
             continue;
         }
@@ -727,69 +794,60 @@ void ModChannelUpdateAllTick(int tick_number)
         if ((ch->effect == EFFECT_VIBRATO) ||
             (ch->effect == EFFECT_VIBRATO_VOL_SLIDE))
         {
-            if (tick_number > 0)
-            {
-                int speed = ch->vibrato_args >> 4;
-                int depth = ch->vibrato_args & 0xF;
+            int speed = ch->vibrato_args >> 4;
+            int depth = ch->vibrato_args & 0xF;
 
-                ch->vibrato_tick = (ch->vibrato_tick + speed) & 63;
+            ch->vibrato_tick = (ch->vibrato_tick + speed) & 63;
 
-                int sine = ch->vibrato_wave_table[ch->vibrato_tick];
+            int sine = ch->vibrato_wave_table[ch->vibrato_tick];
 
-                int value = (sine * depth) >> 7; // Divide by 128
+            int value = (sine * depth) >> 7; // Divide by 128
 
-                uint64_t period = ModGetSampleTickPeriodFromAmigaPeriod(ch->amiga_period + value);
-                MixerChannelSetNotePeriod(ch->mixer_channel_handle, period);
-            }
+            uint64_t period = ModGetSampleTickPeriodFromAmigaPeriod(ch->amiga_period + value);
+            MixerChannelSetNotePeriod(ch->mixer_channel_handle, period);
         }
 
         if ((ch->effect == EFFECT_VOLUME_SLIDE) ||
             (ch->effect == EFFECT_PORTA_VOL_SLIDE) ||
             (ch->effect == EFFECT_VIBRATO_VOL_SLIDE))
         {
-            if (tick_number > 0)
+            int volume = ch->volume + (int8_t)ch->effect_params;
+
+            if (volume > 255)
+                volume = 255;
+
+            if (volume < 0)
+                volume = 0;
+
+            if (volume != ch->volume)
             {
-                int volume = ch->volume + (int8_t)ch->effect_params;
-
-                if (volume > 255)
-                    volume = 255;
-
-                if (volume < 0)
-                    volume = 0;
-
-                if (volume != ch->volume)
-                {
-                    ch->volume = volume;
-                    MixerChannelSetVolume(handle, volume);
-                }
+                ch->volume = volume;
+                MixerChannelSetVolume(handle, volume);
             }
         }
 
         if ((ch->effect == EFFECT_PORTA_TO_NOTE) ||
             (ch->effect == EFFECT_PORTA_VOL_SLIDE))
         {
-            if (tick_number != 0)
+            int32_t target = ch->porta_to_note_target_amiga_period;
+
+            if (target > ch->amiga_period)
             {
-                int32_t target = ch->porta_to_note_target_amiga_period;
+                ch->amiga_period += ch->porta_to_note_speed;
+                if (target < ch->amiga_period)
+                    ch->amiga_period = target;
 
+                uint64_t period = ModGetSampleTickPeriodFromAmigaPeriod(ch->amiga_period);
+                MixerChannelSetNotePeriod(ch->mixer_channel_handle, period);
+            }
+            else if (target < ch->amiga_period)
+            {
+                ch->amiga_period -= ch->porta_to_note_speed;
                 if (target > ch->amiga_period)
-                {
-                    ch->amiga_period += ch->porta_to_note_speed;
-                    if (target < ch->amiga_period)
-                        ch->amiga_period = target;
+                    ch->amiga_period = target;
 
-                    uint64_t period = ModGetSampleTickPeriodFromAmigaPeriod(ch->amiga_period);
-                    MixerChannelSetNotePeriod(ch->mixer_channel_handle, period);
-                }
-                else if (target < ch->amiga_period)
-                {
-                    ch->amiga_period -= ch->porta_to_note_speed;
-                    if (target > ch->amiga_period)
-                        ch->amiga_period = target;
-
-                    uint64_t period = ModGetSampleTickPeriodFromAmigaPeriod(ch->amiga_period);
-                    MixerChannelSetNotePeriod(ch->mixer_channel_handle, period);
-                }
+                uint64_t period = ModGetSampleTickPeriodFromAmigaPeriod(ch->amiga_period);
+                MixerChannelSetNotePeriod(ch->mixer_channel_handle, period);
             }
         }
     }

@@ -211,7 +211,7 @@ static void UMOD_Tick(void)
 
     if (loaded_song.current_ticks < loaded_song.song_speed)
     {
-        ModChannelUpdateAllTick(loaded_song.current_ticks);
+        ModChannelUpdateAllTick_TN(loaded_song.current_ticks);
         return;
     }
 
@@ -325,7 +325,7 @@ static void UMOD_Tick(void)
 
     //printf("\n");
 
-    ModChannelUpdateAllTick(loaded_song.current_ticks);
+    ModChannelUpdateAllTick_T0();
 
     if (jump_to_pattern >= 0)
     {

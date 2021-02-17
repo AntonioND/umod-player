@@ -29,13 +29,12 @@ typedef struct {
 
     struct {
         uint8_t    *pointer; // Pointer to sample data
-        size_t      size;
-        size_t      loop_start;
-        size_t      loop_end;
+        uint64_t    size;
+        uint64_t    loop_start;
+        uint64_t    loop_end;
 
-        uint32_t    position; // Position in the sample to read from
-        uint64_t    elapsed_ticks; // 48.16. Do position++ when elapsed > period
-        uint64_t    period; // 48.16
+        uint64_t    position; // 32.32 Position in the sample to read from
+        uint64_t    position_inc_per_sample; // 32.32
     } sample;
 
     uint32_t    handle; // Handle that was given to the owner of this channel
@@ -138,20 +137,19 @@ int MixerChannelSetSampleOffset(uint32_t handle, uint32_t offset)
 
     mixer_channel_info *ch = &mixer_channel[channel];
 
-    if (offset >= ch->sample.size)
+    if (offset >= (ch->sample.size >> 32))
     {
         // Fail if the position is out of bounds. Stop channel.
         MixerChannelStop(handle);
         return -1;
     }
 
-    ch->sample.position = offset;
-    ch->sample.elapsed_ticks = 0;
+    ch->sample.position = (uint64_t)offset << 32;
 
     return 0;
 }
 
-int MixerChannelSetNotePeriod(uint32_t handle, uint64_t period) // 48.16
+int MixerChannelSetNotePeriod(uint32_t handle, uint64_t period) // 32.32
 {
     int channel = MixerChannelGetIndex(handle);
 
@@ -160,14 +158,17 @@ int MixerChannelSetNotePeriod(uint32_t handle, uint64_t period) // 48.16
 
     mixer_channel_info *ch = &mixer_channel[channel];
 
-    if (period == 0)
-        period = 1;
+    if (period == 0) // TODO: Make sure this makes sense
+    {
+        ch->play_state = STATE_STOP;
+        return -1;
+    }
 
-    ch->sample.position = 0;
-    ch->sample.elapsed_ticks = 0;
-    ch->sample.period = period;
+    ch->sample.position = 0; // 32.32
 
-    ch->sample.position = 0;
+    // (16.48 / 32.32) << 16 = (48.16) << 16 = 32.32
+    ch->sample.position_inc_per_sample = (((uint64_t)1 << 48) / period) << 16;
+
     ch->play_state = STATE_PLAY;
 
     return 0;
@@ -187,9 +188,9 @@ int MixerChannelSetInstrument(uint32_t handle, void *instrument_pointer)
 
     umodpack_instrument *instrument = instrument_pointer;
 
-    uint32_t size = instrument->size;
-    uint32_t loop_start = instrument->loop_start;
-    uint32_t loop_end = instrument->loop_end;
+    uint64_t size = instrument->size;
+    uint64_t loop_start = instrument->loop_start;
+    uint64_t loop_end = instrument->loop_end;
     uint8_t *pointer = &instrument->data[0];
 
     // Save data
@@ -197,9 +198,9 @@ int MixerChannelSetInstrument(uint32_t handle, void *instrument_pointer)
     mixer_channel_info *ch = &mixer_channel[channel];
 
     ch->sample.pointer = pointer;
-    ch->sample.size = size;
-    ch->sample.loop_start = loop_start;
-    ch->sample.loop_end = loop_end;
+    ch->sample.size = size << 32;
+    ch->sample.loop_start = loop_start << 32;
+    ch->sample.loop_end = loop_end << 32;
 
     return 0;
 }
@@ -272,49 +273,45 @@ void MixerMix(uint8_t *left_buffer, uint8_t *right_buffer, size_t buffer_size)
         {
             mixer_channel_info *ch = active_ch[i];
 
-            int value = ch->sample.pointer[ch->sample.position]; // -128..127
+            int value = ch->sample.pointer[ch->sample.position >> 32]; // -128..127
 
             total_left += value * ch->left_volume;
             total_right += value * ch->right_volume;
 
-            // Increment sample pointer if needed
+            // Increment sample pointer
+            ch->sample.position += ch->sample.position_inc_per_sample;
 
-            ch->sample.elapsed_ticks += (uint64_t)1 << 32; // 1.0 in 32.32 format
-            while (ch->sample.elapsed_ticks >= ch->sample.period)
+            if (ch->play_state == STATE_PLAY)
             {
-                ch->sample.elapsed_ticks -= ch->sample.period;
-                ch->sample.position++;
-
-                if (ch->play_state == STATE_PLAY)
+                if (ch->sample.position >= ch->sample.size)
                 {
-                    if (ch->sample.position >= ch->sample.size)
+                    if (ch->sample.loop_end == ch->sample.loop_start)
                     {
-                        if (ch->sample.loop_end == ch->sample.loop_start)
-                        {
-                            ch->sample.position = 0;
-                            ch->play_state = STATE_STOP;
+                        ch->sample.position = 0;
+                        ch->play_state = STATE_STOP;
 
-                            // Remove this channel from the list
-                            for (int j = i; j < active_channels - 1; j++)
-                                active_ch[j] = active_ch[j + 1];
+                        // Remove this channel from the list
+                        for (int j = i; j < active_channels - 1; j++)
+                            active_ch[j] = active_ch[j + 1];
 
-                            active_channels--;
+                        active_channels--;
 
-                            break;
-                        }
-                        else
-                        {
-                            ch->sample.position = ch->sample.loop_start;
-                            ch->play_state = STATE_LOOP;
-                        }
+                        break;
                     }
-                }
-                else // if (ch->play_state == STATE_LOOP)
-                {
-                    if (ch->sample.position >= ch->sample.loop_end)
+                    else
                     {
                         ch->sample.position = ch->sample.loop_start;
+                        ch->play_state = STATE_LOOP;
                     }
+                }
+            }
+            else // if (ch->play_state == STATE_LOOP)
+            {
+                while (ch->sample.position >= ch->sample.loop_end)
+                {
+                    uint64_t len = ch->sample.loop_end - ch->sample.loop_start;
+
+                    ch->sample.position -= len;
                 }
             }
         }

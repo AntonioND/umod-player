@@ -327,8 +327,6 @@ static void UMOD_Tick(void)
 
     ModChannelUpdateAllTick(loaded_song.current_ticks);
 
-    ModChannelUpdateAllRow();
-
     if (jump_to_pattern >= 0)
     {
         loaded_song.current_pattern = jump_to_pattern;

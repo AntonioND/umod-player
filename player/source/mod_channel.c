@@ -792,12 +792,5 @@ void ModChannelUpdateAllTick(int tick_number)
                 }
             }
         }
-
-        // TODO : Other effects
     }
-}
-
-void ModChannelUpdateAllRow(void)
-{
-    // TODO
 }

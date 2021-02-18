@@ -45,14 +45,14 @@ int main(int argc, char *argv[])
     while (UMOD_IsPlayingSong())
     {
 #define SIZE (SAMPLE_RATE / 60)
-        uint8_t left[SIZE], right[SIZE];
+        int8_t left[SIZE], right[SIZE];
         UMOD_Mix(&left[0], &right[0], SIZE);
 
         uint8_t buffer[SIZE * 2];
         for (int i = 0; i < SIZE; i++)
         {
-            buffer[i * 2 + 0] = left[i];
-            buffer[i * 2 + 1] = right[i];
+            buffer[i * 2 + 0] = left[i] + 128;
+            buffer[i * 2 + 1] = right[i] + 128;
         }
 
         WAV_FileStream(buffer, sizeof(buffer));

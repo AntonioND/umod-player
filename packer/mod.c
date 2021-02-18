@@ -245,6 +245,7 @@ int add_mod(const char *path)
             if (volume > 255)
                 volume = 255;
 
+            // Note: The samples of a MOD file are 8-bit signed
             instrument_index[i] = instrument_add(instrument_pointer,
                                                  instrument_size,
                                                  volume, instrument->fine_tune,

@@ -49,8 +49,8 @@
 
 static int current_dma_buffer = 0;
 
-ALIGN(32) uint8_t wave_a[BUFFER_SIZE * 2];
-ALIGN(32) uint8_t wave_b[BUFFER_SIZE * 2];
+ALIGN(32) int8_t wave_a[BUFFER_SIZE * 2];
+ALIGN(32) int8_t wave_b[BUFFER_SIZE * 2];
 
 IWRAM_CODE void Audio_DMA_Retrigger(void)
 {

@@ -103,7 +103,7 @@ int instrument_add(uint8_t *data, size_t size, int volume, int finetune,
         return -1;
 
     for (size_t i = 0; i < size; i++)
-        instrument->data[i] = data[i] - 128;
+        instrument->data[i] = data[i];
 
     return instrument_index;
 }

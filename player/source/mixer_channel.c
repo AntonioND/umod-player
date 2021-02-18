@@ -241,7 +241,7 @@ int MixerChannelSetPanning(uint32_t handle, int panning)
 #define UNROLLED_LOOP_ITERATIONS    16
 
 ARM_CODE IWRAM_CODE
-void MixerMix(uint8_t *left_buffer, uint8_t *right_buffer, size_t buffer_size)
+void MixerMix(int8_t *left_buffer, int8_t *right_buffer, size_t buffer_size)
 {
     // Get list of all active channels
 

@@ -22,6 +22,6 @@ int MixerChannelSetInstrument(uint32_t handle, void *instrument_pointer);
 int MixerChannelSetVolume(uint32_t handle, int volume);
 int MixerChannelSetPanning(uint32_t handle, int panning);
 
-void MixerMix(uint8_t *left_buffer, uint8_t *right_buffer, size_t buffer_size);
+void MixerMix(int8_t *left_buffer, int8_t *right_buffer, size_t buffer_size);
 
 #endif // UMOD_MIXER_CHANNEL_H__

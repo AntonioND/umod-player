@@ -364,7 +364,7 @@ static void UMOD_Tick(void)
     }
 }
 
-void UMOD_Mix(uint8_t *left_buffer, uint8_t *right_buffer, size_t buffer_size)
+void UMOD_Mix(int8_t *left_buffer, int8_t *right_buffer, size_t buffer_size)
 {
     while (buffer_size > 0)
     {

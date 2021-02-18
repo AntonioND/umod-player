@@ -300,19 +300,21 @@ void MixerMix(uint8_t *left_buffer, uint8_t *right_buffer, size_t buffer_size)
                     }
                     else
                     {
-                        ch->sample.position = ch->sample.loop_start;
+                        uint64_t len = ch->sample.loop_end - ch->sample.loop_start;
+
+                        while (ch->sample.position >= ch->sample.loop_end)
+                            ch->sample.position -= len;
+
                         ch->play_state = STATE_LOOP;
                     }
                 }
             }
             else // if (ch->play_state == STATE_LOOP)
             {
-                while (ch->sample.position >= ch->sample.loop_end)
-                {
-                    uint64_t len = ch->sample.loop_end - ch->sample.loop_start;
+                uint64_t len = ch->sample.loop_end - ch->sample.loop_start;
 
+                while (ch->sample.position >= ch->sample.loop_end)
                     ch->sample.position -= len;
-                }
             }
         }
 

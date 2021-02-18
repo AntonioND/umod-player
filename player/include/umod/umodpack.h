@@ -37,6 +37,8 @@ typedef struct {
     uint8_t     data[];
 } umodpack_instrument;
 
+#define UMODPACK_INSTRUMENT_EXTRA_SAMPLES   64
+
 // Pattern step flags
 
 #define STEP_HAS_INSTRUMENT     (1 << 0)

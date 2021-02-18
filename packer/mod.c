@@ -220,6 +220,9 @@ int add_mod(const char *path)
         }
 #endif
 
+        if (instrument_loop_length < 4)
+            instrument_loop_length = 0;
+
         // Pointer to instrument data start and end
 
         uint8_t *instrument_pointer = instrument_data;

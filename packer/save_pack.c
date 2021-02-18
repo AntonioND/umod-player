@@ -168,14 +168,35 @@ int save_pack(const char *path)
         instrument_get(i, &data, &size, &volume, &finetune,
                        &loop_start, &loop_length);
 
+        int looping = 0;
+        if (loop_length > 0)
+            looping = 1;
+
+        int loop_at_the_end = 1;
+        if ((loop_start + loop_length) < size)
+            loop_at_the_end = 0;
+
         uint32_t size_value;
 
         size_value = size;
         fwrite(&size_value, sizeof(size_value), 1, f);
-        size_value = loop_start;
-        fwrite(&size_value, sizeof(size_value), 1, f);
-        size_value = loop_start + loop_length;
-        fwrite(&size_value, sizeof(size_value), 1, f);
+
+        if ((looping == 1) && (loop_at_the_end == 0))
+        {
+            // If the loop isn't at the end, copy it to the end after the
+            // complete waveform.
+            size_value = size;
+            fwrite(&size_value, sizeof(size_value), 1, f);
+            size_value = size + loop_length;
+            fwrite(&size_value, sizeof(size_value), 1, f);
+        }
+        else
+        {
+            size_value = loop_start;
+            fwrite(&size_value, sizeof(size_value), 1, f);
+            size_value = loop_start + loop_length;
+            fwrite(&size_value, sizeof(size_value), 1, f);
+        }
 
         uint8_t value;
 
@@ -188,6 +209,66 @@ int save_pack(const char *path)
         {
             int8_t sample = data[j];
             fwrite(&sample, sizeof(sample), 1, f);
+        }
+
+        // Write some more samples to help with mixer optimizations
+
+        if (looping)
+        {
+            // Repeat loop
+
+            if (loop_at_the_end)
+            {
+                // The only thing needed is to add the buffer
+
+                size_t j = loop_start;
+
+                for (int s = 0; s < UMODPACK_INSTRUMENT_EXTRA_SAMPLES; s++)
+                {
+                    int8_t sample = data[j];
+                    fwrite(&sample, sizeof(sample), 1, f);
+
+                    j++;
+
+                    if (j == (loop_start + loop_length))
+                        j = loop_start;
+                }
+            }
+            else
+            {
+                // First, copy the loop again
+
+                for (size_t j = loop_start; j <= (loop_start + loop_length); j++)
+                {
+                    int8_t sample = data[j];
+                    fwrite(&sample, sizeof(sample), 1, f);
+                }
+
+                // Then, add the buffer
+
+                size_t j = loop_start;
+
+                for (int s = 0; s < UMODPACK_INSTRUMENT_EXTRA_SAMPLES; s++)
+                {
+                    int8_t sample = data[j];
+                    fwrite(&sample, sizeof(sample), 1, f);
+
+                    j++;
+
+                    if (j == (loop_start + loop_length))
+                        j = loop_start;
+                }
+            }
+        }
+        else
+        {
+            // Write zeroes as buffer
+
+            for (int s = 0; s < UMODPACK_INSTRUMENT_EXTRA_SAMPLES; s++)
+            {
+                int8_t sample = 0;
+                fwrite(&sample, sizeof(sample), 1, f);
+            }
         }
 
         // Align next element to 32 bit

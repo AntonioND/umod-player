@@ -722,7 +722,7 @@ void ModChannelUpdateAllTick_TN(int tick_number)
 
             uint64_t period;
             period = ModGetSampleTickPeriodFromAmigaPeriod(ch->amiga_period);
-            MixerChannelSetNotePeriod(ch->mixer_channel_handle, period);
+            MixerChannelSetNotePeriodPorta(ch->mixer_channel_handle, period);
 
             continue;
         }
@@ -732,7 +732,7 @@ void ModChannelUpdateAllTick_TN(int tick_number)
 
             uint64_t period;
             period = ModGetSampleTickPeriodFromAmigaPeriod(ch->amiga_period);
-            MixerChannelSetNotePeriod(ch->mixer_channel_handle, period);
+            MixerChannelSetNotePeriodPorta(ch->mixer_channel_handle, period);
 
             continue;
         }
@@ -804,7 +804,7 @@ void ModChannelUpdateAllTick_TN(int tick_number)
             int value = (sine * depth) >> 7; // Divide by 128
 
             uint64_t period = ModGetSampleTickPeriodFromAmigaPeriod(ch->amiga_period + value);
-            MixerChannelSetNotePeriod(ch->mixer_channel_handle, period);
+            MixerChannelSetNotePeriodPorta(ch->mixer_channel_handle, period);
         }
 
         if ((ch->effect == EFFECT_VOLUME_SLIDE) ||
@@ -838,7 +838,7 @@ void ModChannelUpdateAllTick_TN(int tick_number)
                     ch->amiga_period = target;
 
                 uint64_t period = ModGetSampleTickPeriodFromAmigaPeriod(ch->amiga_period);
-                MixerChannelSetNotePeriod(ch->mixer_channel_handle, period);
+                MixerChannelSetNotePeriodPorta(ch->mixer_channel_handle, period);
             }
             else if (target < ch->amiga_period)
             {
@@ -847,7 +847,7 @@ void ModChannelUpdateAllTick_TN(int tick_number)
                     ch->amiga_period = target;
 
                 uint64_t period = ModGetSampleTickPeriodFromAmigaPeriod(ch->amiga_period);
-                MixerChannelSetNotePeriod(ch->mixer_channel_handle, period);
+                MixerChannelSetNotePeriodPorta(ch->mixer_channel_handle, period);
             }
         }
     }

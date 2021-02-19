@@ -174,6 +174,27 @@ int MixerChannelSetNotePeriod(uint32_t handle, uint64_t period) // 32.32
     return 0;
 }
 
+int MixerChannelSetNotePeriodPorta(uint32_t handle, uint64_t period) // 32.32
+{
+    int channel = MixerChannelGetIndex(handle);
+
+    if (channel == -1)
+        return -1;
+
+    mixer_channel_info *ch = &mixer_channel[channel];
+
+    if (period == 0) // TODO: Make sure this makes sense
+    {
+        ch->play_state = STATE_STOP;
+        return -1;
+    }
+
+    // 20.44 / 32.32 = 52.12 = 20.12
+    ch->sample.position_inc_per_sample = ((uint64_t)1 << 44) / period;
+
+    return 0;
+}
+
 int MixerChannelSetInstrument(uint32_t handle, void *instrument_pointer)
 {
     int channel = MixerChannelGetIndex(handle);

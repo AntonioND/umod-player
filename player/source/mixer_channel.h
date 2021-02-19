@@ -8,9 +8,43 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <umod/umodpack.h>
+
 #define MIXER_CHANNELS_MAX      8
 
 #define MIXER_HANDLE_INVALID    0
+
+typedef struct {
+    int volume;         // 0...255
+    int left_panning;   // 0...255
+    int right_panning;  // 0...255
+
+    int left_volume;    // volume * left_panning = 0...65535
+    int right_volume;   // volume * right_panning = 0...65535
+
+#define STATE_STOP 0
+#define STATE_PLAY 1
+#define STATE_LOOP 2
+
+    // Set to loop after the first time the sample is played, if loop_start > 4
+    // Note that in the mod file it would be 2, but the size is divided by 2
+    // in the file, and it is multiplied by 2 by the packer.
+    int play_state;
+
+    struct {
+        uint8_t    *pointer;    // Pointer to sample data
+        uint32_t    size;       // 20.12
+        uint32_t    loop_start; // 20.12
+        uint32_t    loop_end;   // 20.12
+
+        uint32_t    position;   // 20.12 Position in the sample to read from
+        uint32_t    position_inc_per_sample; // 20.12
+    } sample;
+
+    uint32_t    handle; // Handle that was given to the owner of this channel
+} mixer_channel_info;
+
+// Handles API
 
 uint32_t MixerChannelAllocate(void);
 int MixerChannelIsPlaying(uint32_t handle);
@@ -19,9 +53,23 @@ int MixerChannelStop(uint32_t handle);
 int MixerChannelSetSampleOffset(uint32_t handle, uint32_t offset);
 int MixerChannelSetNotePeriod(uint32_t handle, uint64_t period); // 32.32
 int MixerChannelSetNotePeriodPorta(uint32_t handle, uint64_t period); // 32.32
-int MixerChannelSetInstrument(uint32_t handle, void *instrument_pointer);
+int MixerChannelSetInstrument(uint32_t handle, umodpack_instrument *instrument_pointer);
 int MixerChannelSetVolume(uint32_t handle, int volume);
 int MixerChannelSetPanning(uint32_t handle, int panning);
+
+// Direct access API
+
+mixer_channel_info *MixerModChannelGet(uint32_t c);
+int MixerModChannelIsPlaying(mixer_channel_info *ch);
+int MixerModChannelStop(mixer_channel_info *ch);
+int MixerModChannelSetSampleOffset(mixer_channel_info *ch, uint32_t offset);
+int MixerModChannelSetNotePeriod(mixer_channel_info *ch, uint64_t period); // 32.32
+int MixerModChannelSetNotePeriodPorta(mixer_channel_info *ch, uint64_t period); // 32.32
+int MixerModChannelSetInstrument(mixer_channel_info *ch, umodpack_instrument *instrument_pointer);
+int MixerModChannelSetVolume(mixer_channel_info *ch, int volume);
+int MixerModChannelSetPanning(mixer_channel_info *ch, int panning);
+
+// Mixer function
 
 void MixerMix(int8_t *left_buffer, int8_t *right_buffer, size_t buffer_size);
 

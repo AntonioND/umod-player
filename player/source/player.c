@@ -159,9 +159,14 @@ int UMOD_PlaySong(uint32_t index)
 
     ReloadPatternData();
 
-    // Reset waveforms of vibrato and tremolo effects
+    ModChannelResetAll();
+
     for (int c = 0; c < MOD_CHANNELS_MAX; c++)
     {
+        // Reset panning
+        ModChannelSetEffect(c, EFFECT_SET_PANNING, 128, -1);
+
+        // Reset waveforms of vibrato and tremolo effects
         ModChannelSetEffect(c, EFFECT_VIBRATO_WAVEFORM, 0, -1);
         ModChannelSetEffect(c, EFFECT_TREMOLO_WAVEFORM, 0, -1);
     }
@@ -171,13 +176,13 @@ int UMOD_PlaySong(uint32_t index)
     return 0;
 }
 
-static void *InstrumentGetPointer(int index)
+static umodpack_instrument *InstrumentGetPointer(int index)
 {
     uint32_t offset = loaded_pack.offsets_samples[index];
     uintptr_t instrument_address = (uintptr_t)loaded_pack.data;
     instrument_address += offset;
 
-    return (void *)instrument_address;
+    return (umodpack_instrument *)instrument_address;
 }
 
 static int SeekRow(int row)
@@ -267,7 +272,7 @@ static void UMOD_Tick(void)
 
         if (effect == EFFECT_DELAY_NOTE)
         {
-            void *instrument_pointer = NULL;
+            umodpack_instrument *instrument_pointer = NULL;
             if (instrument != -1)
                 instrument_pointer = InstrumentGetPointer(instrument);
 
@@ -280,8 +285,11 @@ static void UMOD_Tick(void)
 
         if (instrument != -1)
         {
-            void *instrument_pointer = InstrumentGetPointer(instrument);
+            umodpack_instrument *instrument_pointer = InstrumentGetPointer(instrument);
             ModChannelSetInstrument(c, instrument_pointer);
+
+            if (volume == -1)
+                volume = instrument_pointer->volume;
         }
 
         if (note != -1)

@@ -78,7 +78,7 @@ uint32_t MixerChannelAllocate(void)
 
         mixer_channel_info *ch = &mixer_channel[i];
         ch->handle = handle;
-        ch->left_panning = 128;
+        ch->left_panning = 127;
         ch->right_panning = 128;
         MixerChannelUpdateVolumes(ch);
         return handle;

@@ -32,7 +32,7 @@ typedef struct {
     int play_state;
 
     struct {
-        uint8_t    *pointer;    // Pointer to sample data
+        int8_t     *pointer;    // Pointer to sample data (signed 8 bit)
         uint32_t    size;       // 20.12
         uint32_t    loop_start; // 20.12
         uint32_t    loop_end;   // 20.12

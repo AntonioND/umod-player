@@ -185,7 +185,7 @@ int MixerChannelSetInstrument(uint32_t handle, umodpack_instrument *instrument_p
     uint64_t size = instrument->size;
     uint64_t loop_start = instrument->loop_start;
     uint64_t loop_end = instrument->loop_end;
-    uint8_t *pointer = &instrument->data[0];
+    int8_t *pointer = &instrument->data[0];
 
     // Save data
 
@@ -329,7 +329,7 @@ int MixerModChannelSetInstrument(mixer_channel_info *ch, umodpack_instrument *in
     uint64_t size = instrument->size;
     uint64_t loop_start = instrument->loop_start;
     uint64_t loop_end = instrument->loop_end;
-    uint8_t *pointer = &instrument->data[0];
+    int8_t *pointer = &instrument->data[0];
 
     // Save data
 
@@ -412,7 +412,7 @@ void MixerMix(int8_t *left_buffer, int8_t *right_buffer, size_t buffer_size)
                 mixer_channel_info *ch = active_ch[i];
 
                 // -128..127
-                int32_t value = (int8_t)(ch->sample.pointer[ch->sample.position >> 12]);
+                int32_t value = ch->sample.pointer[ch->sample.position >> 12];
                 ch->sample.position += ch->sample.position_inc_per_sample;
 
                 total_left += value * ch->left_volume;
@@ -503,7 +503,7 @@ void MixerMix(int8_t *left_buffer, int8_t *right_buffer, size_t buffer_size)
             mixer_channel_info *ch = active_ch[i];
 
             // -128..127
-            int32_t value = (int8_t)(ch->sample.pointer[ch->sample.position >> 12]);
+            int32_t value = ch->sample.pointer[ch->sample.position >> 12];
             ch->sample.position += ch->sample.position_inc_per_sample;
 
             total_left += value * ch->left_volume;

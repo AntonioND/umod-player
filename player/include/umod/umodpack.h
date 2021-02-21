@@ -34,7 +34,7 @@ typedef struct {
     uint32_t    loop_end;
     uint8_t     volume;
     uint8_t     finetune;
-    uint8_t     data[];
+    int8_t      data[]; // Samples are 8 bit signed integers
 } umodpack_instrument;
 
 #define UMODPACK_INSTRUMENT_EXTRA_SAMPLES   64

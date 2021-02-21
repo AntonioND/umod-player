@@ -7,6 +7,7 @@
 
 #include "mod.h"
 #include "save_pack.h"
+#include "wav.h"
 
 int add_file(const char *path)
 {
@@ -33,6 +34,13 @@ int add_file(const char *path)
         int song_index;
         int ret = add_mod(path, &song_index);
         printf("Saved [%s] to song index %d\n", path, song_index);
+        return ret;
+    }
+    else if (strcmp(extension, "wav") == 0)
+    {
+        int instrument_index;
+        int ret = add_wav(path, &instrument_index);
+        printf("Saved [%s] to instrument index %d\n", path, instrument_index);
         return ret;
     }
     else

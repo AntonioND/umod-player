@@ -33,7 +33,13 @@ int main(int argc, char *argv[])
 
     UMOD_Init(SAMPLE_RATE);
 
-    UMOD_LoadPack(pack_buffer);
+    int ret = UMOD_LoadPack(pack_buffer);
+    if (ret != 0)
+    {
+        printf("UMOD_LoadPack() failed\n");
+        goto cleanup;
+    }
+
     UMOD_PlaySong(0);
 
     WAV_FileStart(argv[2], SAMPLE_RATE);

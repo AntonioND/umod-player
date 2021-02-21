@@ -67,6 +67,19 @@ int UMOD_LoadPack(const void *pack)
     return 0;
 }
 
+static umodpack_instrument *InstrumentGetPointer(int index)
+{
+    uint32_t offset = loaded_pack.offsets_samples[index];
+    uintptr_t instrument_address = (uintptr_t)loaded_pack.data;
+    instrument_address += offset;
+
+    return (umodpack_instrument *)instrument_address;
+}
+
+// ============================================================================
+//                              Song API
+// ============================================================================
+
 typedef struct {
     int         playing;
 
@@ -174,15 +187,6 @@ int UMOD_PlaySong(uint32_t index)
     loaded_song.playing = 1;
 
     return 0;
-}
-
-static umodpack_instrument *InstrumentGetPointer(int index)
-{
-    uint32_t offset = loaded_pack.offsets_samples[index];
-    uintptr_t instrument_address = (uintptr_t)loaded_pack.data;
-    instrument_address += offset;
-
-    return (umodpack_instrument *)instrument_address;
 }
 
 static int SeekRow(int row)
@@ -372,6 +376,15 @@ static void UMOD_Tick(void)
     }
 }
 
+int UMOD_IsPlayingSong(void)
+{
+    return loaded_song.playing;
+}
+
+// ============================================================================
+//                              Mixer API
+// ============================================================================
+
 void UMOD_Mix(int8_t *left_buffer, int8_t *right_buffer, size_t buffer_size)
 {
     while (buffer_size > 0)
@@ -409,9 +422,4 @@ void UMOD_Mix(int8_t *left_buffer, int8_t *right_buffer, size_t buffer_size)
             return;
         }
     }
-}
-
-int UMOD_IsPlayingSong(void)
-{
-    return loaded_song.playing;
 }

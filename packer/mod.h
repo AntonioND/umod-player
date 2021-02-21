@@ -5,6 +5,6 @@
 #ifndef MOD_H__
 #define MOD_H__
 
-int add_mod(const char *path);
+int add_mod(const char *path, int *song_index);
 
 #endif // MOD_H__

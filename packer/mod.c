@@ -2,6 +2,7 @@
 //
 // Copyright (c) 2021 Antonio Niño Díaz
 
+#include <assert.h>
 #include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -101,8 +102,11 @@ int get_note_index_from_period(uint16_t period)
     return nearest_index;
 }
 
-int add_mod(const char *path)
+int add_mod(const char *path, int *song_index)
 {
+    assert(path != NULL);
+    assert(song_index != NULL);
+
     int ret = -1;
 
     // Load file to memory
@@ -159,7 +163,7 @@ int add_mod(const char *path)
     printf("  Channels: %d\n", channels);
     printf("  Length:   %" PRIu8 " patterns\n", header->song_length);
 
-    int song_index = song_add(header->song_length);
+    *song_index = song_add(header->song_length);
 
     printf("  Pattern list:\n");
 
@@ -598,7 +602,7 @@ int add_mod(const char *path)
 
         int generic_pattern_index = pattern_index[index];
 
-        song_set_pattern(song_index, i, generic_pattern_index);
+        song_set_pattern(*song_index, i, generic_pattern_index);
     }
 
     ret = 0;

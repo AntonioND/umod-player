@@ -30,7 +30,10 @@ int add_file(const char *path)
 
     if (strcmp(extension, "mod") == 0)
     {
-        return add_mod(path);
+        int song_index;
+        int ret = add_mod(path, &song_index);
+        printf("Saved [%s] to song index %d\n", path, song_index);
+        return ret;
     }
     else
     {
@@ -58,7 +61,7 @@ int main(int argc, char *argv[])
 
     for (int i = 0; i < argc; i++)
     {
-        printf("LOADING: %s\n", argv[i]);
+        printf("[*] LOADING: %s\n", argv[i]);
         int ret = add_file(argv[i]);
         if (ret != 0)
             return ret;

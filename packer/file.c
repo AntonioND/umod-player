@@ -16,7 +16,7 @@ void file_load(const char *filename, void **buffer, size_t *size_)
 
     if (f == NULL)
     {
-        printf("File couldn't be opened!");
+        printf("File couldn't be opened!\n");
         return;
     }
 
@@ -27,7 +27,7 @@ void file_load(const char *filename, void **buffer, size_t *size_)
 
     if (size == 0)
     {
-        printf("File size is 0!");
+        printf("File size is 0!\n");
         fclose(f);
         return;
     }
@@ -36,14 +36,14 @@ void file_load(const char *filename, void **buffer, size_t *size_)
     *buffer = malloc(size);
     if (*buffer == NULL)
     {
-        printf("Not enought memory to load file!");
+        printf("Not enought memory to load file!\n");
         fclose(f);
         return;
     }
 
     if (fread(*buffer, size, 1, f) != 1)
     {
-        printf("Error while reading file!");
+        printf("Error while reading file!\n");
         fclose(f);
         free(*buffer);
         return;

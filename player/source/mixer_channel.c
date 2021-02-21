@@ -40,7 +40,7 @@ static inline uint32_t MixerChannelGetNewCounter(void)
 // Returns a handler
 uint32_t MixerChannelAllocate(void)
 {
-    for (uint32_t i = 0; i < MIXER_CHANNELS_MAX; i++)
+    for (uint32_t i = MOD_CHANNELS_MAX; i < MIXER_CHANNELS_MAX; i++)
     {
         if (used_channel_flags & (1 << i))
             continue;
@@ -428,7 +428,7 @@ void MixerMix(int8_t *left_buffer, int8_t *right_buffer, size_t buffer_size)
             // than the number of channels. 4 seems to be a good number to keep the
             // volume up.
 
-            static_assert(MIXER_CHANNELS_MAX == 8);
+            static_assert(MIXER_CHANNELS_MAX == (8 + 4));
             total_left >>= 2 + 8 + 8;  // 4 * max volume * max panning
             total_right >>= 2 + 8 + 8; // 4 * max volume * max panning
 
@@ -510,16 +510,6 @@ void MixerMix(int8_t *left_buffer, int8_t *right_buffer, size_t buffer_size)
             total_right += value * ch->right_volume;
         }
 
-        // Total = sample * number of channels * volume * panning
-        //       -128...127         8            0...255  0...255
-        //
-        // The result needs to be scaled down and clamped to -128...127
-        //
-        // Divide by volume, panning first. Then, divide by a number smaller
-        // than the number of channels. 4 seems to be a good number to keep the
-        // volume up.
-
-        static_assert(MIXER_CHANNELS_MAX == 8);
         total_left >>= 2 + 8 + 8;  // 4 * max volume * max panning
         total_right >>= 2 + 8 + 8; // 4 * max volume * max panning
 

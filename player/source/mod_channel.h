@@ -7,7 +7,7 @@
 
 #include <umod/umodpack.h>
 
-#define MOD_CHANNELS_MAX    8
+#define MOD_CHANNELS_MAX    (8)
 
 void ModSetSampleRateConvertConstant(uint32_t sample_rate);
 

@@ -10,7 +10,10 @@
 
 #include <umod/umodpack.h>
 
-#define MIXER_CHANNELS_MAX      8
+#include "mod_channel.h"
+
+#define MIXER_SFX_CHANNELS      (4)
+#define MIXER_CHANNELS_MAX      (MOD_CHANNELS_MAX + MIXER_SFX_CHANNELS)
 
 #define MIXER_HANDLE_INVALID    0
 

@@ -4,7 +4,6 @@
 
 #include <stdint.h>
 #include <stdio.h>
-#include <string.h>
 
 #include <umod/umod.h>
 #include <umod/umodpack.h>
@@ -390,37 +389,38 @@ void UMOD_Mix(int8_t *left_buffer, int8_t *right_buffer, size_t buffer_size)
 {
     while (buffer_size > 0)
     {
-        if (loaded_song.samples_left_for_tick == 0)
-        {
-            UMOD_Tick();
-            loaded_song.samples_left_for_tick = loaded_song.samples_per_tick;
-        }
-
         if (loaded_song.playing == 0)
         {
-            memset(left_buffer, 0, buffer_size);
-            memset(right_buffer, 0, buffer_size);
-            return;
-        }
-
-        if (buffer_size >= loaded_song.samples_left_for_tick)
-        {
-            size_t size = loaded_song.samples_left_for_tick;
-
-            MixerMix(left_buffer, right_buffer, size);
-            left_buffer += size;
-            right_buffer += size;
-            buffer_size -= size;
-
-            loaded_song.samples_left_for_tick = 0;
-        }
-        else // if (buffer_size < loaded_song.samples_left_for_tick)
-        {
             MixerMix(left_buffer, right_buffer, buffer_size);
+            break;
+        }
+        else
+        {
+            if (loaded_song.samples_left_for_tick == 0)
+            {
+                UMOD_Tick();
+                loaded_song.samples_left_for_tick = loaded_song.samples_per_tick;
+            }
 
-            loaded_song.samples_left_for_tick -= buffer_size;
+            if (buffer_size >= loaded_song.samples_left_for_tick)
+            {
+                size_t size = loaded_song.samples_left_for_tick;
 
-            return;
+                MixerMix(left_buffer, right_buffer, size);
+                left_buffer += size;
+                right_buffer += size;
+                buffer_size -= size;
+
+                loaded_song.samples_left_for_tick = 0;
+            }
+            else // if (buffer_size < loaded_song.samples_left_for_tick)
+            {
+                MixerMix(left_buffer, right_buffer, buffer_size);
+
+                loaded_song.samples_left_for_tick -= buffer_size;
+
+                return;
+            }
         }
     }
 }

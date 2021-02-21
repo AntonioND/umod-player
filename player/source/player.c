@@ -50,12 +50,13 @@ int UMOD_LoadPack(const void *pack)
     loaded_pack.num_patterns = header->num_patterns;
     loaded_pack.num_instruments = header->num_instruments;
 
-    if ((loaded_pack.num_songs == 0) ||
-        (loaded_pack.num_patterns == 0) ||
-        (loaded_pack.num_instruments == 0))
-    {
+    // If there are songs, it is needed to at least have one pattern
+    if ((loaded_pack.num_songs > 0) && (loaded_pack.num_patterns == 0))
         return -1;
-    }
+
+    // Reject any file with no instruments
+    if (loaded_pack.num_instruments == 0)
+        return -2;
 
     uint32_t *read_ptr = (uint32_t *)((uintptr_t)pack + sizeof(umodpack_header));
     loaded_pack.offsets_songs = read_ptr;

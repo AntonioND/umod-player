@@ -187,7 +187,7 @@ int add_mod(const char *path)
     uint8_t *pattern_data = (uint8_t *)header;
     pattern_data += sizeof(mod_header);
 
-    uint8_t *instrument_data = pattern_data;
+    int8_t *instrument_data = (int8_t *)pattern_data;
     instrument_data += channels * (max_pattern_index + 1) * channels * MOD_ROWS;
 
     // Save instrument data
@@ -225,13 +225,13 @@ int add_mod(const char *path)
 
         // Pointer to instrument data start and end
 
-        uint8_t *instrument_pointer = instrument_data;
+        int8_t *instrument_pointer = instrument_data;
 
-        uint8_t *instrument_next = instrument_pointer + instrument_size;
+        int8_t *instrument_next = instrument_pointer + instrument_size;
 
-        if (instrument_next > ((uint8_t *)buffer +  size))
+        if (instrument_next > ((int8_t *)buffer +  size))
         {
-            size_t overflow = instrument_next - ((uint8_t *)buffer +  size);
+            size_t overflow = instrument_next - ((int8_t *)buffer +  size);
             printf("File instrument region overflowed: %zu bytes\n", overflow);
             goto cleanup;
         }
@@ -245,7 +245,7 @@ int add_mod(const char *path)
             if (volume > 255)
                 volume = 255;
 
-            // Note: The samples of a MOD file are 8-bit signed
+            // Note: The samples of a MOD file are already 8-bit signed
             instrument_index[i] = instrument_add(instrument_pointer,
                                                  instrument_size,
                                                  volume, instrument->fine_tune,

@@ -32,9 +32,10 @@ typedef struct {
     uint32_t    size;
     uint32_t    loop_start;
     uint32_t    loop_end;
+    uint32_t    frequency;  // Default playback frequency.
     uint8_t     volume;
     uint8_t     finetune;
-    int8_t      data[]; // Samples are 8 bit signed integers
+    int8_t      data[];     // Waveform data. Samples are 8 bit signed integers.
 } umodpack_instrument;
 
 #define UMODPACK_INSTRUMENT_EXTRA_SAMPLES   64

@@ -8,12 +8,13 @@
 #include <string.h>
 
 typedef struct {
-    int8_t *data;
-    size_t  size;
-    int     volume;
-    int     finetune;
-    size_t  loop_start;
-    size_t  loop_length;
+    int8_t     *data;
+    size_t      size;
+    int         volume;
+    int         finetune;
+    size_t      loop_start;
+    size_t      loop_length;
+    uint32_t    frequency;  // Default playback frequency (for WAV files)
 } generic_instrument;
 
 generic_instrument **instruments;
@@ -60,7 +61,7 @@ static int new_instrument(void)
 }
 
 int instrument_add(int8_t *data, size_t size, int volume, int finetune,
-                   size_t loop_start, size_t loop_length)
+                   size_t loop_start, size_t loop_length, uint32_t frequency)
 {
     // Fix instrument
 
@@ -97,6 +98,7 @@ int instrument_add(int8_t *data, size_t size, int volume, int finetune,
     instrument->finetune = finetune;
     instrument->loop_start = loop_start;
     instrument->loop_length = loop_length;
+    instrument->frequency = frequency;
 
     instrument->data = malloc(size);
     if (instrument->data == NULL)
@@ -115,7 +117,8 @@ int instrument_total_number(void)
 
 int instrument_get(int instrument_index, int8_t **data, size_t *size,
                    int *volume, int *finetune,
-                   size_t *loop_start, size_t *loop_length)
+                   size_t *loop_start, size_t *loop_length,
+                   uint32_t *frequency)
 {
     if (instrument_index >= instruments_used)
         return -1;
@@ -128,6 +131,7 @@ int instrument_get(int instrument_index, int8_t **data, size_t *size,
     *loop_start = instrument->loop_start;
     *loop_length = instrument->loop_length;
     *data = instrument->data;
+    *frequency = instrument->frequency;
 
     return 0;
 }

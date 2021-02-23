@@ -164,9 +164,10 @@ int save_pack(const char *path)
         int8_t *data;
         size_t size, loop_start, loop_length;
         int volume, finetune;
+        uint32_t frequency;
 
         instrument_get(i, &data, &size, &volume, &finetune,
-                       &loop_start, &loop_length);
+                       &loop_start, &loop_length, &frequency);
 
         int looping = 0;
         if (loop_length > 0)
@@ -197,6 +198,9 @@ int save_pack(const char *path)
             size_value = loop_start + loop_length;
             fwrite(&size_value, sizeof(size_value), 1, f);
         }
+
+        size_value = frequency;
+        fwrite(&size_value, sizeof(size_value), 1, f);
 
         uint8_t value;
 

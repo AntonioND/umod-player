@@ -254,7 +254,8 @@ int add_mod(const char *path, int *song_index)
                                                  instrument_size,
                                                  volume, instrument->fine_tune,
                                                  instrument_loop_point,
-                                                 instrument_loop_length);
+                                                 instrument_loop_length,
+                                                 0);
         }
 
         // Point to next instrument data

@@ -51,6 +51,7 @@ typedef struct {
 
 uint32_t MixerChannelAllocate(void);
 int MixerChannelIsPlaying(uint32_t handle);
+int MixerChannelStart(uint32_t handle);
 int MixerChannelStop(uint32_t handle);
 
 int MixerChannelSetSampleOffset(uint32_t handle, uint32_t offset);

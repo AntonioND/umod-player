@@ -17,4 +17,8 @@ void UMOD_Mix(int8_t *left_buffer, int8_t *right_buffer, size_t buffer_size);
 int UMOD_PlaySong(uint32_t index);
 int UMOD_IsPlayingSong(void);
 
+// SFX API
+
+int UMOD_SFX_Play(uint32_t index);
+
 #endif // UMOD_UMOD_H__

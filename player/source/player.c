@@ -382,6 +382,35 @@ int UMOD_IsPlayingSong(void)
 }
 
 // ============================================================================
+//                              SFX API
+// ============================================================================
+
+int UMOD_SFX_Play(uint32_t index)
+{
+    if (index >= loaded_pack.num_instruments)
+        return -1;
+
+    uint32_t handle = MixerChannelAllocate();
+
+    if (handle == MIXER_HANDLE_INVALID)
+        return -1;
+
+    umodpack_instrument *instrument_pointer = InstrumentGetPointer(index);
+
+    MixerChannelSetInstrument(handle, instrument_pointer);
+
+    uint64_t period = ((uint64_t)global_sample_rate << 32) // 32.32
+                    / instrument_pointer->frequency; // 64.0
+    MixerChannelSetNotePeriod(handle, period); // 32.32
+
+    MixerChannelSetVolume(handle, 255);
+
+    MixerChannelStart(handle);
+
+    return 0;
+}
+
+// ============================================================================
 //                              Mixer API
 // ============================================================================
 

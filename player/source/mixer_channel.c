@@ -42,14 +42,13 @@ uint32_t MixerChannelAllocate(void)
 {
     for (uint32_t i = MOD_CHANNELS_MAX; i < MIXER_CHANNELS_MAX; i++)
     {
-        if (used_channel_flags & (1 << i))
-            continue;
+        mixer_channel_info *ch = &mixer_channel[i];
 
-        used_channel_flags |= (1 << i);
+        if (ch->play_state != STATE_STOP)
+            continue;
 
         uint32_t handle = (MixerChannelGetNewCounter() << 16) | i;
 
-        mixer_channel_info *ch = &mixer_channel[i];
         ch->handle = handle;
         ch->left_panning = 127;
         ch->right_panning = 128;
@@ -85,20 +84,34 @@ int MixerChannelIsPlaying(uint32_t handle)
     return 1;
 }
 
+int MixerChannelStart(uint32_t handle)
+{
+    int channel = MixerChannelGetIndex(handle);
+
+    if (channel == -1)
+        return -1;
+
+    mixer_channel_info *ch = &mixer_channel[channel];
+
+    ch->sample.position = 0; // 20.12
+
+    ch->play_state = STATE_PLAY;
+
+    return 0;
+}
+
 int MixerChannelStop(uint32_t handle)
 {
     int channel = MixerChannelGetIndex(handle);
 
     if (channel == -1)
-        return 0;
-
-    used_channel_flags &= ~(1 << channel);
+        return -1;
 
     mixer_channel_info *ch = &mixer_channel[channel];
 
     ch->play_state = STATE_STOP;
 
-    return 1;
+    return 0;
 }
 
 int MixerChannelSetSampleOffset(uint32_t handle, uint32_t offset)
@@ -141,8 +154,6 @@ int MixerChannelSetNotePeriod(uint32_t handle, uint64_t period) // 32.32
 
     // 20.44 / 32.32 = 52.12 = 20.12
     ch->sample.position_inc_per_sample = ((uint64_t)1 << 44) / period;
-
-    ch->play_state = STATE_PLAY;
 
     return 0;
 }

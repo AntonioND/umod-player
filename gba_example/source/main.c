@@ -15,6 +15,7 @@
 #include <umod/umod.h>
 
 #include "pack_bin.h"
+#include "pack_info.h"
 
 // Buffer size needs to be a multiple of 16 (the amount of bytes copied to the
 // FIFO whenever it gets data from DMA).
@@ -94,8 +95,8 @@ void Audio_DMA_Setup(void)
     REG_DMA1CNT = 0;
     REG_DMA2CNT = 0;
 
-#define	PTR_REG_FIFO_A  ((uint32_t volatile *)0x40000A0)
-#define	PTR_REG_FIFO_B  ((uint32_t volatile *)0x40000A4)
+#define PTR_REG_FIFO_A  ((uint32_t volatile *)0x40000A0)
+#define PTR_REG_FIFO_B  ((uint32_t volatile *)0x40000A4)
 
     REG_DMA1SAD = (uintptr_t)&wave_a[0];
     REG_DMA1DAD = (uintptr_t)PTR_REG_FIFO_A;
@@ -124,7 +125,7 @@ int main(void)
 
     Audio_DMA_Setup();
 
-    UMOD_PlaySong(0);
+    UMOD_PlaySong(SONG_KAOS_OCH_DEKADENS_MOD);
 
     while (1)
     {
@@ -134,6 +135,16 @@ int main(void)
             UMOD_Mix(&wave_a[BUFFER_SIZE], &wave_b[BUFFER_SIZE], BUFFER_SIZE);
 
         current_dma_buffer ^= 1;
+
+        scanKeys();
+
+        int keys_pressed = keysDown();
+
+        if (keys_pressed & KEY_A)
+            UMOD_SFX_Play(SFX_LASER2_1_WAV);
+
+        if (keys_pressed & KEY_B)
+            UMOD_SFX_Play(SFX_HELICOPTER_WAV);
 
         VBlankIntrWait();
     }

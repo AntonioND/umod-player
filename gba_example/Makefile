@@ -106,6 +106,9 @@ export OFILES_SOURCES := $(CPPFILES:.cpp=.o) $(CFILES:.c=.o) $(SFILES:.s=.o)
 export OFILES := $(OFILES_BIN) $(OFILES_SOURCES)
 
 export HFILES := $(addsuffix .h,$(subst .,_,$(BINFILES)))
+ifneq ($(strip $(AUDIO)),)
+	HFILES += pack_info.h
+endif
 
 export INCLUDE	:=	$(foreach dir,$(INCLUDES),-iquote $(CURDIR)/$(dir)) \
 					$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
@@ -147,9 +150,9 @@ $(OFILES_SOURCES) : $(HFILES)
 #---------------------------------------------------------------------------------
 # rule to build soundbank from music files
 #---------------------------------------------------------------------------------
-pack.bin : $(AUDIOFILES)
+pack.bin pack_info.h : $(AUDIOFILES)
 #---------------------------------------------------------------------------------
-	$(CURDIR)/../../build/packer/umod_packer pack.bin $^
+	$(CURDIR)/../../build/packer/umod_packer pack.bin pack_info.h $^
 
 #---------------------------------------------------------------------------------
 # This rule links in binary data with the .bin extension

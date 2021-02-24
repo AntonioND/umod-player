@@ -12,12 +12,13 @@ function(test_mod_wav mod_name)
     set(REF_TAR_BZ "${CMAKE_CURRENT_SOURCE_DIR}/${base_name}.wav.tar.bz")
     set(REF_WAV "${CMAKE_CURRENT_BINARY_DIR}/${base_name}.wav")
     set(REF_PACK "${CMAKE_CURRENT_BINARY_DIR}/${base_name}_pack.bin")
+    set(REF_HEADER "${CMAKE_CURRENT_BINARY_DIR}/${base_name}_header.h")
     set(GEN_WAV "${CMAKE_CURRENT_BINARY_DIR}/${base_name}_generated.wav")
 
     # Add test to CTest
 
     set(CMD1 "${CMAKE_COMMAND} -E tar -xf ${REF_TAR_BZ}")
-    set(CMD2 "$<TARGET_FILE:umod_packer> ${REF_PACK} ${REF_MOD}")
+    set(CMD2 "$<TARGET_FILE:umod_packer> ${REF_PACK} ${REF_HEADER} ${REF_MOD}")
     set(CMD3 "$<TARGET_FILE:umod_renderer>  ${REF_PACK} ${GEN_WAV}")
     set(CMD4 "${CMAKE_COMMAND} -E compare_files ${REF_WAV} ${GEN_WAV}")
 
@@ -33,7 +34,7 @@ function(test_mod_wav mod_name)
 
     # Add target to autogenerate the new compressed file to be used as reference
 
-    set(CMD1 "$<TARGET_FILE:umod_packer> ${REF_PACK} ${REF_MOD}")
+    set(CMD1 "$<TARGET_FILE:umod_packer> ${REF_PACK} ${REF_HEADER} ${REF_MOD}")
     set(CMD2 "$<TARGET_FILE:umod_renderer>  ${REF_PACK} ${REF_WAV}")
     set(CMD3 "${CMAKE_COMMAND} -E tar -cfj ${REF_TAR_BZ} ${REF_WAV}")
 

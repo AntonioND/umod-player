@@ -19,32 +19,35 @@
 // https://web.archive.org/web/20040317073101/http://ccrma-www.stanford.edu/courses/422/projects/WaveFormat/
 
 #pragma pack(push, 1)
+
+// RIFF header
 typedef struct {
-
-    // RIFF header
-
     uint32_t chunk_id;          // "RIFF" == 0x46464952
     uint32_t chunk_size;        // File size - size of (chunk_id + chunk_size)
     uint32_t format;            // "WAVE" == 0x45564157
+} riff_header;
 
-    // "fmt " subchunk
-
-    uint32_t subchunk_1_id;     // "fmt " == 0x20746D66
-    uint32_t subchunk_1_size;   // 16 for PCM
+// "fmt " subchunk
+#define ID_FMT 0x20746D66
+typedef struct {
+    uint32_t subchunk_id;       // "fmt " == 0x20746D66
+    uint32_t subchunk_size;     // 16 for PCM
     uint16_t audio_format;      // PCM = 1
     uint16_t num_channels;      // Mono = 1, Stereo = 2
     uint32_t sample_rate;       // Samples per second
     uint32_t byte_rate;         // sample_rate * num_channels * bits_per_sample / 8
     uint16_t block_align;       // num_channels * bits_per_sample / 8
     uint16_t bits_per_sample;   // 8 bits = 8, 16 bits = 16, etc.
+} fmt_subchunk;
 
-    // "data" subchunk
-
-    uint32_t subchunk_2_id;     // "data" == 0x61746164
-    uint32_t subchunk_2_size;   // Size of data following this entry
+// "data" subchunk
+#define ID_DATA 0x61746164
+typedef struct {
+    uint32_t subchunk_id;       // "data" == 0x61746164
+    uint32_t subchunk_size;     // Size of data following this entry
     // uint8_t data[]           // Sound data is stored here
+} data_subchunk;
 
-} wav_header_t;
 #pragma pack(pop)
 
 int add_wav(const char *path, int *instrument_index)
@@ -63,97 +66,146 @@ int add_wav(const char *path, int *instrument_index)
 
     file_load(path, &buffer, &size);
 
-    if (size < sizeof(wav_header_t))
+    if (size < sizeof(riff_header))
     {
-        printf("File is too small.\n");
+        printf("  File is too small.\n");
         goto cleanup;
     }
 
     // Check header of the WAV file
 
-    wav_header_t *header = buffer;
+    riff_header *header = buffer;
 
     if (header->chunk_id != 0x46464952)
     {
-        printf("Not a wav file: chunk ID: %" PRIx32 "\n", header->chunk_id);
+        printf("  Not a wav file: chunk ID: %" PRIx32 "\n", header->chunk_id);
         goto cleanup;
     }
 
-    if ((header->chunk_size + sizeof(uint32_t) + sizeof(uint32_t)) !=
-        (header->subchunk_2_size + sizeof(wav_header_t)))
+    if ((header->chunk_size + sizeof(uint32_t) + sizeof(uint32_t)) != size)
     {
-        printf("Inconsistent sizes: %" PRIx32 " %" PRIx32 "\n",
-               header->chunk_size, header->subchunk_2_size);
+        printf("  Inconsistent sizes: 0x%" PRIx32 " 0x%zx\n",
+               header->chunk_size, size);
         goto cleanup;
     }
 
     if (header->format != 0x45564157)
     {
-        printf("Not a wav file: format: %" PRIx32 "\n", header->format);
+        printf("  Not a wav file: format: %" PRIx32 "\n", header->format);
         goto cleanup;
     }
 
-    if (header->subchunk_1_id != 0x20746D66)
+    // Iterate through all subchunks
+
+    void *subchunk = (uint32_t *)((uintptr_t)header + sizeof(riff_header));
+
+    int format_read = 0;
+    int data_read = 0;
+
+    uint32_t sample_rate = 0;
+    uint16_t bits_per_sample = 0;
+    uint32_t data_size = 0;
+    void *wav_data = NULL;
+
+    while (1)
     {
-        printf("Not a wav file: subchunk 1 ID: %" PRIx32 "\n",
-               header->subchunk_1_id);
-        goto cleanup;
+        uintptr_t offset = (uintptr_t)subchunk - (uintptr_t)header;
+        if (offset >= size)
+            break;
+
+        uint32_t subchunk_id = ((uint32_t *)subchunk)[0];
+        uint32_t subchunk_size = ((uint32_t *)subchunk)[1];
+
+        printf("  Subchunk at offset %lu (%" PRIu32 " bytes) [%c%c%c%c]\n",
+               offset, subchunk_size,
+               subchunk_id & 0xFF,
+               (subchunk_id >> 8) & 0xFF,
+               (subchunk_id >> 16) & 0xFF,
+               (subchunk_id >> 24) & 0xFF);
+
+        if (subchunk_id == ID_FMT)
+        {
+            format_read = 1;
+
+            fmt_subchunk *fmt = subchunk;
+
+            if (fmt->subchunk_size != 16)
+            {
+                printf("  Not a valid wav file: subchunk fmt size: %" PRIx32 "\n",
+                    fmt->subchunk_size);
+                goto cleanup;
+            }
+
+            if (fmt->audio_format != 1)
+            {
+                printf("  Not a valid wav file: audio format: %" PRIx16 "\n",
+                       fmt->audio_format);
+                goto cleanup;
+            }
+
+            if (fmt->num_channels != 1)
+            {
+                printf("  Only wav files with one channel are supported: num channels: %"
+                       PRIx16 "\n",
+                       fmt->num_channels);
+                goto cleanup;
+            }
+
+            sample_rate = fmt->sample_rate;
+
+            printf("    Sample rate: %" PRIu32 "\n", sample_rate);
+
+            if (fmt->byte_rate !=
+                (sample_rate * fmt->num_channels * fmt->bits_per_sample / 8))
+            {
+                printf("    Inconsistent byte rate\n");
+                goto cleanup;
+            }
+
+            if (fmt->block_align != (fmt->num_channels * fmt->bits_per_sample / 8))
+            {
+                printf("    Inconsistent block align\n");
+                goto cleanup;
+            }
+
+            bits_per_sample = fmt->bits_per_sample;
+
+            printf("    Bits per sample: %" PRIu16 "\n", bits_per_sample);
+
+            subchunk = (void *)((uintptr_t)subchunk + sizeof(fmt_subchunk));
+        }
+        else if (subchunk_id == ID_DATA)
+        {
+            if (format_read == 0)
+            {
+                printf("  Data subchunk found before format subchunk.\n");
+                goto cleanup;
+            }
+
+            data_read = 1;
+
+            data_size = subchunk_size;
+
+            printf("    Data size: %" PRIu32 "\n", data_size);
+
+            // Get pointer to the start of the waveform
+            wav_data = (void *)((uintptr_t)subchunk + sizeof(data_subchunk));
+
+            subchunk = (void *)((uintptr_t)wav_data + data_size);
+        }
+        else
+        {
+            printf("    Unknown subchunk (ignored)\n");
+            subchunk = (void *)((uintptr_t)subchunk + subchunk_size
+                                + sizeof(uint32_t) + sizeof(uint32_t));
+        }
     }
 
-    if (header->subchunk_1_size != 16)
+    if (data_read == 0)
     {
-        printf("Not a wav file: subchunk 1 size: %" PRIx32 "\n",
-               header->subchunk_1_size);
+        printf("  Data subchunk not found.\n");
         goto cleanup;
     }
-
-    if (header->audio_format != 1)
-    {
-        printf("Not a wav file: audio format: %" PRIx16 "\n",
-               header->audio_format);
-        goto cleanup;
-    }
-
-    if (header->num_channels != 1)
-    {
-        printf("Only wav files with one channel are supported: num channels: %" PRIx16 "\n",
-               header->num_channels);
-        goto cleanup;
-    }
-
-    uint32_t sample_rate = header->sample_rate;
-
-    printf("  Sample rate: %" PRIu32 "\n", sample_rate);
-
-    if (header->byte_rate !=
-        (sample_rate * header->num_channels * header->bits_per_sample / 8))
-    {
-        printf("Inconsistent byte rate\n");
-        goto cleanup;
-    }
-
-    if (header->block_align != (header->num_channels * header->bits_per_sample / 8))
-    {
-        printf("Inconsistent block align\n");
-        goto cleanup;
-    }
-
-    uint16_t bits_per_sample = header->bits_per_sample;
-
-    printf("  Bits per sample: %" PRIu16 "\n", bits_per_sample);
-
-    if (header->subchunk_2_id != 0x61746164)
-    {
-        printf("Not a wav file: subchunk 2 ID: %" PRIx32 "\n", header->subchunk_2_id);
-        goto cleanup;
-    }
-
-    uint32_t data_size = header->subchunk_2_size - sizeof(wav_header_t);
-
-    printf("  Size: %" PRIu32 "\n", data_size);
-
-    // Get pointer to the start of the waveform
-    void *wav_data = (void *)((uintptr_t)header + sizeof(wav_header_t));
 
     if (bits_per_sample == 8)
     {
@@ -193,11 +245,11 @@ int add_wav(const char *path, int *instrument_index)
     }
     else
     {
-        printf("Invalid bits per sample: %" PRIu16 "\n", bits_per_sample);
+        printf("  Invalid bits per sample: %" PRIu16 "\n", bits_per_sample);
         goto cleanup;
     }
 
-    printf("Finished importing wav file.\n");
+    printf("  Finished importing wav file.\n");
 
     ret = 0;
 cleanup:

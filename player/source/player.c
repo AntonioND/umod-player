@@ -42,12 +42,15 @@ uint32_t GetGlobalSampleRate(void)
 
 int UMOD_LoadPack(const void *pack)
 {
+    if (global_sample_rate == 0)
+        return -1;
+
     const umodpack_header *header = pack;
 
     if ((header->magic[0] != 'U') || (header->magic[1] != 'M') ||
         (header->magic[2] != 'O') || (header->magic[3] != 'D'))
     {
-        return -1;
+        return -2;
     }
 
     loaded_pack.data = pack;
@@ -58,11 +61,11 @@ int UMOD_LoadPack(const void *pack)
 
     // If there are songs, it is needed to at least have one pattern
     if ((loaded_pack.num_songs > 0) && (loaded_pack.num_patterns == 0))
-        return -1;
+        return -3;
 
     // Reject any file with no instruments
     if (loaded_pack.num_instruments == 0)
-        return -2;
+        return -4;
 
     uint32_t *read_ptr = (uint32_t *)((uintptr_t)pack + sizeof(umodpack_header));
     loaded_pack.offsets_songs = read_ptr;

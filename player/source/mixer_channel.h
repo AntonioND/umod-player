@@ -51,16 +51,6 @@ typedef struct {
 
 uint32_t MixerChannelAllocate(void);
 mixer_channel_info *MixerChannelGet(uint32_t handle);
-int MixerChannelIsPlaying(uint32_t handle);
-int MixerChannelStart(uint32_t handle);
-int MixerChannelStop(uint32_t handle);
-
-int MixerChannelSetSampleOffset(uint32_t handle, uint32_t offset);
-int MixerChannelSetNotePeriod(uint32_t handle, uint64_t period); // 32.32
-int MixerChannelSetNotePeriodPorta(uint32_t handle, uint64_t period); // 32.32
-int MixerChannelSetInstrument(uint32_t handle, umodpack_instrument *instrument_pointer);
-int MixerChannelSetVolume(uint32_t handle, int volume);
-int MixerChannelSetPanning(uint32_t handle, int panning);
 
 // Direct access API
 

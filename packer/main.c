@@ -34,7 +34,7 @@ int add_file(const char *path)
     {
         int song_index;
         int ret = add_mod(path, &song_index);
-        printf("Saved [%s] to song index %d\n", path, song_index);
+        printf("Saved to song index %d\n", song_index);
 
         if (ret == 0)
             header_add_song(path, song_index);
@@ -45,7 +45,7 @@ int add_file(const char *path)
     {
         int instrument_index;
         int ret = add_wav(path, &instrument_index);
-        printf("Saved [%s] to instrument index %d\n", path, instrument_index);
+        printf("Saved to instrument index %d\n", instrument_index);
 
         if (ret == 0)
             header_add_sfx(path, instrument_index);

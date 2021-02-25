@@ -83,7 +83,11 @@ int save_pack(const char *path)
         {
             long align = (4 - (ftell(f) & 3)) & 3;
             uint8_t val = 0;
-            fwrite(&val, sizeof(val), align, f);
+            while (align > 0)
+            {
+                fwrite(&val, sizeof(val), 1, f);
+                align--;
+            }
         }
     }
 
@@ -151,7 +155,11 @@ int save_pack(const char *path)
         {
             long align = (4 - (ftell(f) & 3)) & 3;
             uint8_t val = 0;
-            fwrite(&val, sizeof(val), align, f);
+            while (align > 0)
+            {
+                fwrite(&val, sizeof(val), 1, f);
+                align--;
+            }
         }
     }
 
@@ -279,7 +287,11 @@ int save_pack(const char *path)
         {
             long align = (4 - (ftell(f) & 3)) & 3;
             uint8_t val = 0;
-            fwrite(&val, sizeof(val), align, f);
+            while (align > 0)
+            {
+                fwrite(&val, sizeof(val), 1, f);
+                align--;
+            }
         }
     }
 

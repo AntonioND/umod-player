@@ -120,7 +120,7 @@ int add_mod(const char *path, int *song_index)
 
     if (size < sizeof(mod_header))
     {
-        printf("File is too small.\n");
+        printf("File is too small: %zu bytes\n", size);
         goto cleanup;
     }
 

@@ -60,6 +60,17 @@ uint32_t MixerChannelAllocate(void)
     return MIXER_HANDLE_INVALID;
 }
 
+mixer_channel_info *MixerChannelGet(uint32_t handle)
+{
+    uint32_t channel = handle & 0xFFFF;
+
+    // If the channel has a different handler, the handle is no longer valid
+    if (mixer_channel[channel].handle != handle)
+        return NULL;
+
+    return &mixer_channel[channel];
+}
+
 static int MixerChannelGetIndex(uint32_t handle)
 {
     uint32_t channel = handle & 0xFFFF;
@@ -263,6 +274,17 @@ int MixerModChannelIsPlaying(mixer_channel_info *ch)
         return 0;
 
     return 1;
+}
+
+int MixerModChannelStart(mixer_channel_info *ch)
+{
+    assert(ch != NULL);
+
+    ch->sample.position = 0; // 20.12
+
+    ch->play_state = STATE_PLAY;
+
+    return 0;
 }
 
 int MixerModChannelStop(mixer_channel_info *ch)

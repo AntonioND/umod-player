@@ -19,6 +19,6 @@ int UMOD_IsPlayingSong(void);
 
 // SFX API
 
-int UMOD_SFX_Play(uint32_t index);
+uint32_t UMOD_SFX_Play(uint32_t index);
 
 #endif // UMOD_UMOD_H__

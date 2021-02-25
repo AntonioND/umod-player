@@ -2,6 +2,7 @@
 //
 // Copyright (c) 2021 Antonio Niño Díaz
 
+#include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
 
@@ -11,6 +12,7 @@
 #include "definitions.h"
 #include "mixer_channel.h"
 #include "mod_channel.h"
+#include "sound_effect.h"
 
 typedef struct {
     const void *data;
@@ -31,6 +33,11 @@ void UMOD_Init(uint32_t sample_rate)
     global_sample_rate = sample_rate;
 
     ModSetSampleRateConvertConstant(sample_rate);
+}
+
+uint32_t GetGlobalSampleRate(void)
+{
+    return global_sample_rate;
 }
 
 int UMOD_LoadPack(const void *pack)
@@ -385,29 +392,25 @@ int UMOD_IsPlayingSong(void)
 //                              SFX API
 // ============================================================================
 
-int UMOD_SFX_Play(uint32_t index)
+uint32_t UMOD_SFX_Play(uint32_t index)
 {
     if (index >= loaded_pack.num_instruments)
         return -1;
 
     uint32_t handle = MixerChannelAllocate();
 
-    if (handle == MIXER_HANDLE_INVALID)
-        return -1;
+    if (handle != MIXER_HANDLE_INVALID)
+    {
+        mixer_channel_info *ch = MixerChannelGet(handle);
 
-    umodpack_instrument *instrument_pointer = InstrumentGetPointer(index);
+        assert(ch != NULL);
 
-    MixerChannelSetInstrument(handle, instrument_pointer);
+        umodpack_instrument *instrument_pointer = InstrumentGetPointer(index);
 
-    uint64_t period = ((uint64_t)global_sample_rate << 32) // 32.32
-                    / instrument_pointer->frequency; // 64.0
-    MixerChannelSetNotePeriod(handle, period); // 32.32
+        SFX_Play(ch, instrument_pointer);
+    }
 
-    MixerChannelSetVolume(handle, 255);
-
-    MixerChannelStart(handle);
-
-    return 0;
+    return handle;
 }
 
 // ============================================================================

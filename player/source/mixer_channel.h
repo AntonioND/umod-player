@@ -50,6 +50,7 @@ typedef struct {
 // Handles API
 
 uint32_t MixerChannelAllocate(void);
+mixer_channel_info *MixerChannelGet(uint32_t handle);
 int MixerChannelIsPlaying(uint32_t handle);
 int MixerChannelStart(uint32_t handle);
 int MixerChannelStop(uint32_t handle);
@@ -65,6 +66,7 @@ int MixerChannelSetPanning(uint32_t handle, int panning);
 
 mixer_channel_info *MixerModChannelGet(uint32_t c);
 int MixerModChannelIsPlaying(mixer_channel_info *ch);
+int MixerModChannelStart(mixer_channel_info *ch);
 int MixerModChannelStop(mixer_channel_info *ch);
 int MixerModChannelSetSampleOffset(mixer_channel_info *ch, uint32_t offset);
 int MixerModChannelSetNotePeriod(mixer_channel_info *ch, uint64_t period); // 32.32

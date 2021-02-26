@@ -48,24 +48,24 @@ typedef struct {
     uint32_t    handle; // Handle that was given to the owner of this channel
 } mixer_channel_info;
 
-// Handles API
+// Handles API (for SFXs)
 
 uint32_t MixerChannelAllocate(void);
 mixer_channel_info *MixerChannelGet(uint32_t handle);
 
 // Direct access API
 
-mixer_channel_info *MixerModChannelGet(uint32_t c);
-int MixerModChannelIsPlaying(mixer_channel_info *ch);
-int MixerModChannelStart(mixer_channel_info *ch);
-int MixerModChannelStop(mixer_channel_info *ch);
-int MixerModChannelSetSampleOffset(mixer_channel_info *ch, uint32_t offset);
-int MixerModChannelSetNotePeriod(mixer_channel_info *ch, uint64_t period); // 32.32
-int MixerModChannelSetNotePeriodPorta(mixer_channel_info *ch, uint64_t period); // 32.32
-int MixerModChannelSetInstrument(mixer_channel_info *ch, umodpack_instrument *instrument_pointer);
-int MixerModChannelSetLoop(mixer_channel_info *ch, umod_loop_type loop_type);
-int MixerModChannelSetVolume(mixer_channel_info *ch, int volume);
-int MixerModChannelSetPanning(mixer_channel_info *ch, int panning);
+mixer_channel_info *MixerModChannelGet(uint32_t channel_number);
+int MixerChannelIsPlaying(mixer_channel_info *ch);
+int MixerChannelStart(mixer_channel_info *ch);
+int MixerChannelStop(mixer_channel_info *ch);
+int MixerChannelSetSampleOffset(mixer_channel_info *ch, uint32_t offset);
+int MixerChannelSetNotePeriod(mixer_channel_info *ch, uint64_t period); // 32.32
+int MixerChannelSetNotePeriodPorta(mixer_channel_info *ch, uint64_t period); // 32.32
+int MixerChannelSetInstrument(mixer_channel_info *ch, umodpack_instrument *instrument_pointer);
+int MixerChannelSetLoop(mixer_channel_info *ch, umod_loop_type loop_type);
+int MixerChannelSetVolume(mixer_channel_info *ch, int volume);
+int MixerChannelSetPanning(mixer_channel_info *ch, int panning);
 
 // Mixer function
 

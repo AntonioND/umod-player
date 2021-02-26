@@ -124,7 +124,7 @@ void ModChannelReset(int channel)
 
     assert(mod_ch->ch != NULL);
 
-    MixerModChannelStop(mod_ch->ch);
+    MixerChannelStop(mod_ch->ch);
 }
 
 void ModChannelResetAll(void)
@@ -259,7 +259,7 @@ void ModChannelSetNote(int channel, int note)
 
     // TODO: Finetune from effect
     uint64_t period = ModGetSampleTickPeriod(note, finetune);
-    MixerModChannelSetNotePeriod(mod_ch->ch, period);
+    MixerChannelSetNotePeriod(mod_ch->ch, period);
 
     uint32_t amiga_period = ModNoteToAmigaPeriod(note, 0);
     mod_ch->amiga_period = amiga_period;
@@ -275,7 +275,7 @@ void ModChannelSetVolume(int channel, int volume)
 
     mod_ch->volume = volume;
 
-    MixerModChannelSetVolume(mod_ch->ch, mod_ch->volume);
+    MixerChannelSetVolume(mod_ch->ch, mod_ch->volume);
 }
 
 void ModChannelSetInstrument(int channel, umodpack_instrument *instrument_pointer)
@@ -288,7 +288,7 @@ void ModChannelSetInstrument(int channel, umodpack_instrument *instrument_pointe
 
     mod_ch->instrument_pointer = instrument_pointer;
 
-    MixerModChannelSetInstrument(mod_ch->ch, mod_ch->instrument_pointer);
+    MixerChannelSetInstrument(mod_ch->ch, mod_ch->instrument_pointer);
 }
 
 void ModChannelSetEffectDelayNote(int channel, int effect_params, int note,
@@ -326,7 +326,7 @@ void ModChannelSetEffect(int channel, int effect, int effect_params, int note)
 
             // TODO: Finetune from effect
             uint64_t period = ModGetSampleTickPeriod(mod_ch->note, finetune);
-            MixerModChannelSetNotePeriod(mod_ch->ch, period);
+            MixerChannelSetNotePeriod(mod_ch->ch, period);
 
             uint32_t amiga_period = ModNoteToAmigaPeriod(mod_ch->note, 0);
             mod_ch->amiga_period = amiga_period;
@@ -343,7 +343,7 @@ void ModChannelSetEffect(int channel, int effect, int effect_params, int note)
     else if (effect == EFFECT_SET_PANNING)
     {
         mod_ch->panning = effect_params;
-        MixerModChannelSetPanning(mod_ch->ch, mod_ch->panning);
+        MixerChannelSetPanning(mod_ch->ch, mod_ch->panning);
     }
     else if (effect == EFFECT_ARPEGGIO)
     {
@@ -434,7 +434,7 @@ void ModChannelUpdateAllTick_T0(void)
             if (mod_ch->effect_params == 0)
             {
                 mod_ch->effect = EFFECT_NONE;
-                MixerModChannelSetVolume(mod_ch->ch, 0);
+                MixerChannelSetVolume(mod_ch->ch, 0);
             }
 
             continue;
@@ -464,7 +464,7 @@ void ModChannelUpdateAllTick_T0(void)
 
             // TODO: Finetune from effect
             uint64_t period = ModGetSampleTickPeriod(note, finetune);
-            MixerModChannelSetNotePeriod(mod_ch->ch, period);
+            MixerChannelSetNotePeriod(mod_ch->ch, period);
 
             uint32_t amiga_period = ModNoteToAmigaPeriod(note, 0);
             mod_ch->amiga_period = amiga_period;
@@ -484,7 +484,7 @@ void ModChannelUpdateAllTick_T0(void)
             if (volume != mod_ch->volume)
             {
                 mod_ch->volume = volume;
-                MixerModChannelSetVolume(mod_ch->ch, volume);
+                MixerChannelSetVolume(mod_ch->ch, volume);
             }
 
             continue;
@@ -497,7 +497,7 @@ void ModChannelUpdateAllTick_T0(void)
 
             uint64_t period;
             period = ModGetSampleTickPeriodFromAmigaPeriod(mod_ch->amiga_period);
-            MixerModChannelSetNotePeriod(mod_ch->ch, period);
+            MixerChannelSetNotePeriod(mod_ch->ch, period);
 
             continue;
         }
@@ -507,7 +507,7 @@ void ModChannelUpdateAllTick_T0(void)
 
             uint64_t period;
             period = ModGetSampleTickPeriodFromAmigaPeriod(mod_ch->amiga_period);
-            MixerModChannelSetNotePeriod(mod_ch->ch, period);
+            MixerChannelSetNotePeriod(mod_ch->ch, period);
 
             continue;
         }
@@ -526,7 +526,7 @@ void ModChannelUpdateAllTick_T0(void)
                 mod_ch->sample_offset = offset;
             }
 
-            MixerModChannelSetSampleOffset(mod_ch->ch, offset);
+            MixerChannelSetSampleOffset(mod_ch->ch, offset);
 
             continue;
         }
@@ -535,7 +535,7 @@ void ModChannelUpdateAllTick_T0(void)
             if (mod_ch->retrig_tick >= mod_ch->effect_params)
             {
                 mod_ch->retrig_tick = 0;
-                MixerModChannelSetSampleOffset(mod_ch->ch, 0);
+                MixerChannelSetSampleOffset(mod_ch->ch, 0);
             }
 
             mod_ch->retrig_tick++;
@@ -577,7 +577,7 @@ void ModChannelUpdateAllTick_TN(int tick_number)
             if (mod_ch->effect_params == tick_number)
             {
                 mod_ch->effect = EFFECT_NONE;
-                MixerModChannelSetVolume(mod_ch->ch, 0);
+                MixerChannelSetVolume(mod_ch->ch, 0);
             }
 
             continue;
@@ -607,7 +607,7 @@ void ModChannelUpdateAllTick_TN(int tick_number)
 
             // TODO: Finetune from effect
             uint64_t period = ModGetSampleTickPeriod(note, finetune);
-            MixerModChannelSetNotePeriod(mod_ch->ch, period);
+            MixerChannelSetNotePeriod(mod_ch->ch, period);
 
             uint32_t amiga_period = ModNoteToAmigaPeriod(note, 0);
             mod_ch->amiga_period = amiga_period;
@@ -622,7 +622,7 @@ void ModChannelUpdateAllTick_TN(int tick_number)
 
             uint64_t period;
             period = ModGetSampleTickPeriodFromAmigaPeriod(mod_ch->amiga_period);
-            MixerModChannelSetNotePeriodPorta(mod_ch->ch, period);
+            MixerChannelSetNotePeriodPorta(mod_ch->ch, period);
 
             continue;
         }
@@ -632,7 +632,7 @@ void ModChannelUpdateAllTick_TN(int tick_number)
 
             uint64_t period;
             period = ModGetSampleTickPeriodFromAmigaPeriod(mod_ch->amiga_period);
-            MixerModChannelSetNotePeriodPorta(mod_ch->ch, period);
+            MixerChannelSetNotePeriodPorta(mod_ch->ch, period);
 
             continue;
         }
@@ -656,7 +656,7 @@ void ModChannelUpdateAllTick_TN(int tick_number)
             else if (volume > 255)
                 volume = 255;
 
-            MixerModChannelSetVolume(mod_ch->ch, volume);
+            MixerChannelSetVolume(mod_ch->ch, volume);
 
             continue;
         }
@@ -665,7 +665,7 @@ void ModChannelUpdateAllTick_TN(int tick_number)
             if (mod_ch->retrig_tick >= mod_ch->effect_params)
             {
                 mod_ch->retrig_tick = 0;
-                MixerModChannelSetSampleOffset(mod_ch->ch, 0);
+                MixerChannelSetSampleOffset(mod_ch->ch, 0);
             }
 
             mod_ch->retrig_tick++;
@@ -704,7 +704,7 @@ void ModChannelUpdateAllTick_TN(int tick_number)
             int value = (sine * depth) >> 7; // Divide by 128
 
             uint64_t period = ModGetSampleTickPeriodFromAmigaPeriod(mod_ch->amiga_period + value);
-            MixerModChannelSetNotePeriodPorta(mod_ch->ch, period);
+            MixerChannelSetNotePeriodPorta(mod_ch->ch, period);
         }
 
         if ((mod_ch->effect == EFFECT_VOLUME_SLIDE) ||
@@ -722,7 +722,7 @@ void ModChannelUpdateAllTick_TN(int tick_number)
             if (volume != mod_ch->volume)
             {
                 mod_ch->volume = volume;
-                MixerModChannelSetVolume(mod_ch->ch, volume);
+                MixerChannelSetVolume(mod_ch->ch, volume);
             }
         }
 
@@ -738,7 +738,7 @@ void ModChannelUpdateAllTick_TN(int tick_number)
                     mod_ch->amiga_period = target;
 
                 uint64_t period = ModGetSampleTickPeriodFromAmigaPeriod(mod_ch->amiga_period);
-                MixerModChannelSetNotePeriodPorta(mod_ch->ch, period);
+                MixerChannelSetNotePeriodPorta(mod_ch->ch, period);
             }
             else if (target < mod_ch->amiga_period)
             {
@@ -747,7 +747,7 @@ void ModChannelUpdateAllTick_TN(int tick_number)
                     mod_ch->amiga_period = target;
 
                 uint64_t period = ModGetSampleTickPeriodFromAmigaPeriod(mod_ch->amiga_period);
-                MixerModChannelSetNotePeriodPorta(mod_ch->ch, period);
+                MixerChannelSetNotePeriodPorta(mod_ch->ch, period);
             }
         }
     }

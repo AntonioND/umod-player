@@ -19,8 +19,8 @@ static void MixerChannelUpdateVolumes(mixer_channel_info *ch)
     ch->right_volume = ch->volume * ch->right_panning;
 }
 
-// Handles API
-// ===========
+// Handles API (for SFXs)
+// ======================
 
 static uint32_t handle_counter;
 
@@ -71,16 +71,16 @@ mixer_channel_info *MixerChannelGet(uint32_t handle)
 // Direct access API
 // =================
 
-mixer_channel_info *MixerModChannelGet(uint32_t c)
+mixer_channel_info *MixerModChannelGet(uint32_t channel_number)
 {
-    assert(c < MIXER_CHANNELS_MAX);
+    assert(channel_number < MIXER_CHANNELS_MAX);
 
-    mixer_channel_info *ch = &mixer_channel[c];
+    mixer_channel_info *ch = &mixer_channel[channel_number];
 
     return ch;
 }
 
-int MixerModChannelIsPlaying(mixer_channel_info *ch)
+int MixerChannelIsPlaying(mixer_channel_info *ch)
 {
     assert(ch != NULL);
 
@@ -90,7 +90,7 @@ int MixerModChannelIsPlaying(mixer_channel_info *ch)
     return 1;
 }
 
-int MixerModChannelStart(mixer_channel_info *ch)
+int MixerChannelStart(mixer_channel_info *ch)
 {
     assert(ch != NULL);
 
@@ -101,7 +101,7 @@ int MixerModChannelStart(mixer_channel_info *ch)
     return 0;
 }
 
-int MixerModChannelStop(mixer_channel_info *ch)
+int MixerChannelStop(mixer_channel_info *ch)
 {
     assert(ch != NULL);
 
@@ -110,7 +110,7 @@ int MixerModChannelStop(mixer_channel_info *ch)
     return 1;
 }
 
-int MixerModChannelSetSampleOffset(mixer_channel_info *ch, uint32_t offset)
+int MixerChannelSetSampleOffset(mixer_channel_info *ch, uint32_t offset)
 {
     assert(ch != NULL);
 
@@ -126,7 +126,7 @@ int MixerModChannelSetSampleOffset(mixer_channel_info *ch, uint32_t offset)
     return 0;
 }
 
-int MixerModChannelSetNotePeriod(mixer_channel_info *ch, uint64_t period) // 32.32
+int MixerChannelSetNotePeriod(mixer_channel_info *ch, uint64_t period) // 32.32
 {
     assert(ch != NULL);
 
@@ -146,7 +146,7 @@ int MixerModChannelSetNotePeriod(mixer_channel_info *ch, uint64_t period) // 32.
     return 0;
 }
 
-int MixerModChannelSetNotePeriodPorta(mixer_channel_info *ch, uint64_t period) // 32.32
+int MixerChannelSetNotePeriodPorta(mixer_channel_info *ch, uint64_t period) // 32.32
 {
     assert(ch != NULL);
 
@@ -162,7 +162,7 @@ int MixerModChannelSetNotePeriodPorta(mixer_channel_info *ch, uint64_t period) /
     return 0;
 }
 
-int MixerModChannelSetInstrument(mixer_channel_info *ch, umodpack_instrument *instrument_pointer)
+int MixerChannelSetInstrument(mixer_channel_info *ch, umodpack_instrument *instrument_pointer)
 {
     assert(ch != NULL);
 
@@ -188,7 +188,7 @@ int MixerModChannelSetInstrument(mixer_channel_info *ch, umodpack_instrument *in
     return 0;
 }
 
-int MixerModChannelSetLoop(mixer_channel_info *ch, umod_loop_type loop_type)
+int MixerChannelSetLoop(mixer_channel_info *ch, umod_loop_type loop_type)
 {
     assert(ch != NULL);
 
@@ -218,7 +218,7 @@ int MixerModChannelSetLoop(mixer_channel_info *ch, umod_loop_type loop_type)
     return 0;
 }
 
-int MixerModChannelSetVolume(mixer_channel_info *ch, int volume)
+int MixerChannelSetVolume(mixer_channel_info *ch, int volume)
 {
     assert(ch != NULL);
 
@@ -229,7 +229,7 @@ int MixerModChannelSetVolume(mixer_channel_info *ch, int volume)
     return 0;
 }
 
-int MixerModChannelSetPanning(mixer_channel_info *ch, int panning)
+int MixerChannelSetPanning(mixer_channel_info *ch, int panning)
 {
     assert(ch != NULL);
 

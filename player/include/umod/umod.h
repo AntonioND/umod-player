@@ -21,6 +21,8 @@ int UMOD_IsPlayingSong(void);
 // SFX API
 // =======
 
+#define UMOD_HANDLE_INVALID     0
+
 typedef uint32_t umod_handle;
 
 typedef enum {

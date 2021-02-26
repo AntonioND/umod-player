@@ -16,8 +16,6 @@
 #define MIXER_SFX_CHANNELS      (4)
 #define MIXER_CHANNELS_MAX      (MOD_CHANNELS_MAX + MIXER_SFX_CHANNELS)
 
-#define MIXER_HANDLE_INVALID    0
-
 typedef struct {
     int volume;         // 0...255
     int left_panning;   // 0...255

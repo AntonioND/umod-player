@@ -402,7 +402,7 @@ umod_handle UMOD_SFX_Play(uint32_t index, umod_loop_type loop_type)
 
     umod_handle handle = MixerChannelAllocate();
 
-    if (handle != MIXER_HANDLE_INVALID)
+    if (handle != UMOD_HANDLE_INVALID)
     {
         mixer_channel_info *ch = MixerChannelGet(handle);
 

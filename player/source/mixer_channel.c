@@ -63,7 +63,7 @@ umod_handle MixerChannelAllocate(void)
     }
 
     // No channel found
-    return MIXER_HANDLE_INVALID;
+    return UMOD_HANDLE_INVALID;
 }
 
 mixer_channel_info *MixerChannelGet(umod_handle handle)

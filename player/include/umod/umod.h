@@ -19,6 +19,13 @@ int UMOD_IsPlayingSong(void);
 
 // SFX API
 
-uint32_t UMOD_SFX_Play(uint32_t index);
+typedef enum {
+    UMOD_LOOP_DEFAULT = 0,
+    UMOD_LOOP_ENABLE  = 1,
+    UMOD_LOOP_DISABLE = 2
+} umod_loop_type;
+
+uint32_t UMOD_SFX_Play(uint32_t index, umod_loop_type loop_type);
+int UMOD_SFX_Stop(uint32_t handle);
 
 #endif // UMOD_UMOD_H__

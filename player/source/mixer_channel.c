@@ -5,6 +5,7 @@
 #include <assert.h>
 #include <stdint.h>
 
+#include <umod/umod.h>
 #include <umod/umodpack.h>
 
 #include "definitions.h"
@@ -183,6 +184,30 @@ int MixerModChannelSetInstrument(mixer_channel_info *ch, umodpack_instrument *in
     ch->sample.size = size << 12;
     ch->sample.loop_start = loop_start << 12;
     ch->sample.loop_end = loop_end << 12;
+
+    return 0;
+}
+
+int MixerModChannelSetLoop(mixer_channel_info *ch, umod_loop_type loop_type)
+{
+    assert(ch != NULL);
+
+    // For this it is needed to have a pointer to the original instrument struct
+    // inside the pack file.
+    assert(loop_type != UMOD_LOOP_DISABLE);
+
+    if (loop_type == UMOD_LOOP_ENABLE)
+    {
+        ch->play_state = STATE_LOOP;
+        ch->sample.loop_start = 0;
+        ch->sample.loop_end = ch->sample.size;
+    }
+    else // if (loop_type == UMOD_LOOP_DISABLE)
+    {
+        ch->play_state = STATE_PLAY;
+        ch->sample.loop_start = 0;
+        ch->sample.loop_end = 0;
+    }
 
     return 0;
 }

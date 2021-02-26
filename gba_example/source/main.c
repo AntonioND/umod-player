@@ -127,6 +127,8 @@ int main(void)
 
     UMOD_PlaySong(SONG_KAOS_OCH_DEKADENS_MOD);
 
+    uint32_t helicopter_handle = 0;
+
     while (1)
     {
         if (current_dma_buffer == 1)
@@ -141,10 +143,20 @@ int main(void)
         int keys_pressed = keysDown();
 
         if (keys_pressed & KEY_A)
-            UMOD_SFX_Play(SFX_LASER2_1_WAV);
+            UMOD_SFX_Play(SFX_LASER2_1_WAV, UMOD_LOOP_DEFAULT);
 
         if (keys_pressed & KEY_B)
-            UMOD_SFX_Play(SFX_HELICOPTER_WAV);
+        {
+            if (helicopter_handle == 0)
+            {
+                helicopter_handle = UMOD_SFX_Play(SFX_HELICOPTER_WAV, UMOD_LOOP_ENABLE);
+            }
+            else
+            {
+                UMOD_SFX_Stop(helicopter_handle);
+                helicopter_handle = 0;
+            }
+        }
 
         VBlankIntrWait();
     }

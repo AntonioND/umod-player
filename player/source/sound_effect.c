@@ -2,6 +2,7 @@
 //
 // Copyright (c) 2021 Antonio Niño Díaz
 
+#include <assert.h>
 #include <stdint.h>
 
 #include <umod/umodpack.h>
@@ -12,6 +13,9 @@
 
 int SFX_Play(mixer_channel_info *ch, umodpack_instrument *instrument_pointer)
 {
+    assert(ch != NULL);
+    assert(instrument_pointer != NULL);
+
     uint64_t sample_rate = (uint64_t)GetGlobalSampleRate();
 
     MixerModChannelSetInstrument(ch, instrument_pointer);
@@ -24,6 +28,24 @@ int SFX_Play(mixer_channel_info *ch, umodpack_instrument *instrument_pointer)
     MixerModChannelSetVolume(ch, 255);
 
     MixerModChannelStart(ch);
+
+    return 0;
+}
+
+int SFX_Loop(mixer_channel_info *ch, umod_loop_type loop_type)
+{
+    assert(ch != NULL);
+
+    MixerModChannelSetLoop(ch, loop_type);
+
+    return 0;
+}
+
+int SFX_Stop(mixer_channel_info *ch)
+{
+    assert(ch != NULL);
+
+    MixerModChannelStop(ch);
 
     return 0;
 }

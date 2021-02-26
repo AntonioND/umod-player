@@ -395,7 +395,7 @@ int UMOD_IsPlayingSong(void)
 //                              SFX API
 // ============================================================================
 
-uint32_t UMOD_SFX_Play(uint32_t index)
+uint32_t UMOD_SFX_Play(uint32_t index, umod_loop_type loop_type)
 {
     if (index >= loaded_pack.num_instruments)
         return -1;
@@ -411,9 +411,24 @@ uint32_t UMOD_SFX_Play(uint32_t index)
         umodpack_instrument *instrument_pointer = InstrumentGetPointer(index);
 
         SFX_Play(ch, instrument_pointer);
+
+        if (loop_type != UMOD_LOOP_DEFAULT)
+            SFX_Loop(ch, loop_type);
     }
 
     return handle;
+}
+
+int UMOD_SFX_Stop(uint32_t handle)
+{
+    mixer_channel_info *ch = MixerChannelGet(handle);
+
+    if (ch == NULL)
+        return -1;
+
+    SFX_Stop(ch);
+
+    return 0;
 }
 
 // ============================================================================

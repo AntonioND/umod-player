@@ -8,6 +8,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <umod/umod.h>
 #include <umod/umodpack.h>
 
 #include "mod_channel.h"
@@ -62,6 +63,7 @@ int MixerModChannelSetSampleOffset(mixer_channel_info *ch, uint32_t offset);
 int MixerModChannelSetNotePeriod(mixer_channel_info *ch, uint64_t period); // 32.32
 int MixerModChannelSetNotePeriodPorta(mixer_channel_info *ch, uint64_t period); // 32.32
 int MixerModChannelSetInstrument(mixer_channel_info *ch, umodpack_instrument *instrument_pointer);
+int MixerModChannelSetLoop(mixer_channel_info *ch, umod_loop_type loop_type);
 int MixerModChannelSetVolume(mixer_channel_info *ch, int volume);
 int MixerModChannelSetPanning(mixer_channel_info *ch, int panning);
 

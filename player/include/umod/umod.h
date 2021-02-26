@@ -13,15 +13,26 @@ int UMOD_LoadPack(const void *pack);
 void UMOD_Mix(int8_t *left_buffer, int8_t *right_buffer, size_t buffer_size);
 
 // Song API
+// ========
 
 int UMOD_PlaySong(uint32_t index);
 int UMOD_IsPlayingSong(void);
 
 // SFX API
+// =======
 
 typedef enum {
+    // WAV files may contain loop information or not. If a WAV file contains
+    // loop information, this value will let the mixer loop the sample as
+    // expected. If it doesn't have information, it will be played once.
     UMOD_LOOP_DEFAULT = 0,
+
+    // In WAV files with no loop information, this tells the mixer to loop the
+    // whole waveform. In WAV files with loop information, it does nothing.
     UMOD_LOOP_ENABLE  = 1,
+
+    // This value disables looping even in WAV effects that have loop
+    // information. Note that it isn't possible to enable looping afterwards.
     UMOD_LOOP_DISABLE = 2
 } umod_loop_type;
 

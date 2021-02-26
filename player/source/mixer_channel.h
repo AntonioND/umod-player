@@ -45,7 +45,7 @@ typedef struct {
         uint32_t    position_inc_per_sample; // 20.12
     } sample;
 
-    uint32_t    handle; // Handle that was given to the owner of this channel
+    umod_handle handle; // Handle that was given to the owner of this channel
 } mixer_channel_info;
 
 // Handles API (for SFXs)

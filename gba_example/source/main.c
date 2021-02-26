@@ -127,7 +127,7 @@ int main(void)
 
     UMOD_PlaySong(SONG_KAOS_OCH_DEKADENS_MOD);
 
-    uint32_t helicopter_handle = 0;
+    umod_handle helicopter_handle = 0;
 
     while (1)
     {

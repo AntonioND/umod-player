@@ -22,6 +22,15 @@ static void MixerChannelUpdateVolumes(mixer_channel_info *ch)
 // Handles API (for SFXs)
 // ======================
 
+// A handle is formed by two uint16_t values packed in one uint32_t. The top
+// uint16_t is a counter that increments by one whenever a new handle is
+// requested. The lower uint16_t is the mixer channel the handle corresponds to.
+// Each mixer channel keeps track of the last handle that was returned for that
+// channel.
+//
+// If a SFX is requested in a channel, it ends, and another SFX is played in the
+// same channel, the handles won't be the same, so it can't be cancelled with
+// the old handle, only with the new one.
 static uint32_t handle_counter;
 
 static inline uint32_t MixerChannelGetNewCounter(void)
@@ -35,7 +44,7 @@ static inline uint32_t MixerChannelGetNewCounter(void)
 }
 
 // Returns a handler
-uint32_t MixerChannelAllocate(void)
+umod_handle MixerChannelAllocate(void)
 {
     for (uint32_t i = MOD_CHANNELS_MAX; i < MIXER_CHANNELS_MAX; i++)
     {
@@ -44,7 +53,7 @@ uint32_t MixerChannelAllocate(void)
         if (ch->play_state != STATE_STOP)
             continue;
 
-        uint32_t handle = (MixerChannelGetNewCounter() << 16) | i;
+        umod_handle handle = (MixerChannelGetNewCounter() << 16) | i;
 
         ch->handle = handle;
         ch->left_panning = 127;
@@ -57,7 +66,7 @@ uint32_t MixerChannelAllocate(void)
     return MIXER_HANDLE_INVALID;
 }
 
-mixer_channel_info *MixerChannelGet(uint32_t handle)
+mixer_channel_info *MixerChannelGet(umod_handle handle)
 {
     uint32_t channel = handle & 0xFFFF;
 

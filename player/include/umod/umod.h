@@ -21,6 +21,8 @@ int UMOD_IsPlayingSong(void);
 // SFX API
 // =======
 
+typedef uint32_t umod_handle;
+
 typedef enum {
     // WAV files may contain loop information or not. If a WAV file contains
     // loop information, this value will let the mixer loop the sample as
@@ -36,7 +38,7 @@ typedef enum {
     UMOD_LOOP_DISABLE = 2
 } umod_loop_type;
 
-uint32_t UMOD_SFX_Play(uint32_t index, umod_loop_type loop_type);
-int UMOD_SFX_Stop(uint32_t handle);
+umod_handle UMOD_SFX_Play(uint32_t index, umod_loop_type loop_type);
+int UMOD_SFX_Stop(umod_handle handle);
 
 #endif // UMOD_UMOD_H__

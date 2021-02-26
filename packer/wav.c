@@ -17,10 +17,13 @@
 // Information taken from:
 //
 // https://web.archive.org/web/20040317073101/http://ccrma-www.stanford.edu/courses/422/projects/WaveFormat/
+// https://sites.google.com/site/musicgapi/technical-documents/wav-file-format
 
 #pragma pack(push, 1)
 
 // RIFF header
+#define ID_RIFF 0x46464952
+#define ID_WAVE 0x45564157
 typedef struct {
     uint32_t chunk_id;          // "RIFF" == 0x46464952
     uint32_t chunk_size;        // File size - size of (chunk_id + chunk_size)
@@ -47,6 +50,40 @@ typedef struct {
     uint32_t subchunk_size;     // Size of data following this entry
     // uint8_t data[]           // Sound data is stored here
 } data_subchunk;
+
+// "smpl" subchunk
+#define ID_SMPL 0x6C706D73
+typedef struct {
+    uint32_t subchunk_id;           // "smpl" == 0x6C706D73
+    uint32_t subchunk_size;         // Size of data following this entry
+    uint32_t manufacturer;          // 0 - 0xFFFFFFFF
+    uint32_t product;               // 0 - 0xFFFFFFFF
+    uint32_t sample_period;         // 0 - 0xFFFFFFFF
+    uint32_t midi_unity_note;       // 0 - 127
+    uint32_t midi_pitch_fraction;   // 0 - 0xFFFFFFFF
+    uint32_t smpte_format;          // 0, 24, 25, 29, 30
+    uint32_t smpte_offset;          // 0 - 0xFFFFFFFF
+    uint32_t num_sample_loops;      // 0 - 0xFFFFFFFF
+    uint32_t sampler_data;          // 0 - 0xFFFFFFFF
+
+    struct {
+        uint32_t cue_point_id;      // 0 - 0xFFFFFFFF
+
+        // Types:
+        //   0 : Loop forward (normal)
+        //   1 : Alternating loop (forward/backward, also known as Ping Pong)
+        //   2 : Loop backward (reverse)
+        //   3 - 31 : Reserved for future standard types
+        //   32 - 0xFFFFFFFF : Sampler specific types (defined by manufacturer)
+        uint32_t type;              // 0 - 0xFFFFFFFF
+
+        uint32_t start;             // 0 - 0xFFFFFFFF
+        uint32_t end;               // 0 - 0xFFFFFFFF
+        uint32_t fraction;          // 0 - 0xFFFFFFFF
+        uint32_t play_count;        // 0 - 0xFFFFFFFF
+    } sample_loop[];
+
+} smpl_subchunk;
 
 #pragma pack(pop)
 
@@ -76,7 +113,7 @@ int add_wav(const char *path, int *instrument_index)
 
     riff_header *header = buffer;
 
-    if (header->chunk_id != 0x46464952)
+    if (header->chunk_id != ID_RIFF)
     {
         printf("  Not a wav file: chunk ID: %" PRIx32 "\n", header->chunk_id);
         goto cleanup;
@@ -89,7 +126,7 @@ int add_wav(const char *path, int *instrument_index)
         goto cleanup;
     }
 
-    if (header->format != 0x45564157)
+    if (header->format != ID_WAVE)
     {
         printf("  Not a wav file: format: %" PRIx32 "\n", header->format);
         goto cleanup;
@@ -106,6 +143,8 @@ int add_wav(const char *path, int *instrument_index)
     uint16_t bits_per_sample = 0;
     uint32_t data_size = 0;
     void *wav_data = NULL;
+    uint32_t wav_loop_start = 0;
+    uint32_t wav_loop_length = 0;
 
     while (1)
     {
@@ -193,6 +232,62 @@ int add_wav(const char *path, int *instrument_index)
 
             subchunk = (void *)((uintptr_t)wav_data + data_size);
         }
+        else if (subchunk_id == ID_SMPL)
+        {
+            if (format_read == 0)
+            {
+                printf("  Sample subchunk found before format subchunk.\n");
+                goto cleanup;
+            }
+
+            smpl_subchunk *smpl = subchunk;
+
+            if (smpl->num_sample_loops != 1)
+            {
+                printf("  Expected one loop. Found %" PRIu32 "\n",
+                       smpl->num_sample_loops);
+                goto cleanup;
+            }
+
+            if (smpl->sample_loop[0].type != 0)
+            {
+                printf("  Only forward loops are supported. Value: %" PRIu32 "\n",
+                       smpl->sample_loop[0].type);
+                goto cleanup;
+            }
+
+            if (smpl->sample_loop[0].play_count != 0)
+            {
+                printf("  Only infinite loops are supported. Value: %" PRIu32 "\n",
+                       smpl->sample_loop[0].play_count);
+                goto cleanup;
+            }
+
+            uint32_t start = smpl->sample_loop[0].start;
+            uint32_t end = smpl->sample_loop[0].end;
+
+            printf("    Loop: %" PRIu32 " - %" PRIu32 "\n", start, end);
+
+            if (end > data_size)
+            {
+                printf("    End is outside of bounds (size = %" PRIu32 "): Clamped.\n",
+                       data_size);
+                end = data_size;
+            }
+
+            if (start > end)
+            {
+                printf("    Start after end. Ignoring loop information.\n");
+            }
+            else
+            {
+                wav_loop_start = start;
+                wav_loop_length = end - start;
+            }
+
+            subchunk = (void *)((uintptr_t)subchunk + subchunk_size
+                                + sizeof(uint32_t) + sizeof(uint32_t));
+        }
         else
         {
             printf("    Unknown subchunk (ignored)\n");
@@ -221,7 +316,7 @@ int add_wav(const char *path, int *instrument_index)
 
         *instrument_index = instrument_add((int8_t *)waveform, waveform_samples,
                                            255, 0, // volume, finetune
-                                           0 , 0, // loop start, length
+                                           wav_loop_start, wav_loop_length,
                                            sample_rate);
     }
     else if (bits_per_sample == 16)
@@ -240,7 +335,7 @@ int add_wav(const char *path, int *instrument_index)
 
         *instrument_index = instrument_add(waveform_dst, waveform_samples,
                                            255, 0, // volume, finetune
-                                           0 , 0,  // loop start, length
+                                           wav_loop_start, wav_loop_length,
                                            sample_rate);
     }
     else

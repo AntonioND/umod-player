@@ -158,6 +158,16 @@ int main(void)
             }
         }
 
+        if (keys_pressed & KEY_L)
+            UMOD_Song_VolumeSet(64);
+        if (keys_pressed & KEY_R)
+            UMOD_Song_VolumeSet(256);
+
+        if (keys_pressed & KEY_DOWN)
+            UMOD_SFX_VolumeSet(64);
+        if (keys_pressed & KEY_UP)
+            UMOD_SFX_VolumeSet(256);
+
         VBlankIntrWait();
     }
 }

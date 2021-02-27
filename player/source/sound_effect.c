@@ -16,6 +16,21 @@
 //                              SFX API
 // ============================================================================
 
+void UMOD_SFX_VolumeSet(int volume)
+{
+    if (volume > 256)
+        volume = 256;
+    else if (volume < 0)
+        volume = 0;
+
+    // Refresh volume of all channels
+    for (int i = MOD_CHANNELS_MAX; i < MIXER_CHANNELS_MAX; i++)
+    {
+        mixer_channel_info *mixer_ch = MixerChannelGetFromIndex(i);
+        MixerChannelSetMasterVolume(mixer_ch, volume);
+    }
+}
+
 umod_handle UMOD_SFX_Play(uint32_t index, umod_loop_type loop_type)
 {
     umod_loaded_pack *loaded_pack = GetLoadedPack();

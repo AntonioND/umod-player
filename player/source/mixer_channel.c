@@ -13,12 +13,6 @@
 
 static mixer_channel_info mixer_channel[MIXER_CHANNELS_MAX];
 
-static void MixerChannelUpdateVolumes(mixer_channel_info *ch)
-{
-    ch->left_volume = ch->volume * ch->left_panning;
-    ch->right_volume = ch->volume * ch->right_panning;
-}
-
 // Handles API (for SFXs)
 // ======================
 
@@ -58,7 +52,7 @@ umod_handle MixerChannelAllocate(void)
         ch->handle = handle;
         ch->left_panning = 127;
         ch->right_panning = 128;
-        MixerChannelUpdateVolumes(ch);
+        MixerChannelRefreshVolumes(ch);
         return handle;
     }
 
@@ -80,13 +74,22 @@ mixer_channel_info *MixerChannelGet(umod_handle handle)
 // Direct access API
 // =================
 
-mixer_channel_info *MixerModChannelGet(uint32_t channel_number)
+mixer_channel_info *MixerChannelGetFromIndex(uint32_t index)
 {
-    assert(channel_number < MIXER_CHANNELS_MAX);
+    assert(index < MIXER_CHANNELS_MAX);
 
-    mixer_channel_info *ch = &mixer_channel[channel_number];
+    mixer_channel_info *ch = &mixer_channel[index];
 
     return ch;
+}
+
+void MixerChannelRefreshVolumes(mixer_channel_info *ch)
+{
+    assert(ch != NULL);
+
+    int channel_volume = ch->master_volume * ch->volume;
+    ch->left_volume = (channel_volume * ch->left_panning) >> 8;
+    ch->right_volume = (channel_volume * ch->right_panning) >> 8;
 }
 
 int MixerChannelIsPlaying(mixer_channel_info *ch)
@@ -233,7 +236,18 @@ int MixerChannelSetVolume(mixer_channel_info *ch, int volume)
 
     ch->volume = volume;
 
-    MixerChannelUpdateVolumes(ch);
+    MixerChannelRefreshVolumes(ch);
+
+    return 0;
+}
+
+int MixerChannelSetMasterVolume(mixer_channel_info *ch, int volume)
+{
+    assert(ch != NULL);
+
+    ch->master_volume = volume;
+
+    MixerChannelRefreshVolumes(ch);
 
     return 0;
 }
@@ -245,7 +259,7 @@ int MixerChannelSetPanning(mixer_channel_info *ch, int panning)
     ch->left_panning = 255 - panning;
     ch->right_panning = panning;
 
-    MixerChannelUpdateVolumes(ch);
+    MixerChannelRefreshVolumes(ch);
 
     return 0;
 }

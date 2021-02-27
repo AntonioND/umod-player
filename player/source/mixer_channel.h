@@ -17,12 +17,15 @@
 #define MIXER_CHANNELS_MAX      (MOD_CHANNELS_MAX + MIXER_SFX_CHANNELS)
 
 typedef struct {
+    int master_volume;
     int volume;         // 0...255
     int left_panning;   // 0...255
     int right_panning;  // 0...255
 
-    int left_volume;    // volume * left_panning = 0...65535
-    int right_volume;   // volume * right_panning = 0...65535
+    // The following variables store the current overall volume to save time
+    // during the mixing routine.
+    int left_volume;    // (master_volume * volume * left_panning) >> 8 = 0...65535
+    int right_volume;   // (master_volume * volume * right_panning) >> 8 = 0...65535
 
 #define STATE_STOP 0
 #define STATE_PLAY 1
@@ -53,7 +56,8 @@ mixer_channel_info *MixerChannelGet(uint32_t handle);
 
 // Direct access API
 
-mixer_channel_info *MixerModChannelGet(uint32_t channel_number);
+mixer_channel_info *MixerChannelGetFromIndex(uint32_t index);
+void MixerChannelRefreshVolumes(mixer_channel_info *ch);
 int MixerChannelIsPlaying(mixer_channel_info *ch);
 int MixerChannelStart(mixer_channel_info *ch);
 int MixerChannelStop(mixer_channel_info *ch);
@@ -63,6 +67,7 @@ int MixerChannelSetNotePeriodPorta(mixer_channel_info *ch, uint64_t period); // 
 int MixerChannelSetInstrument(mixer_channel_info *ch, umodpack_instrument *instrument_pointer);
 int MixerChannelSetLoop(mixer_channel_info *ch, umod_loop_type loop_type);
 int MixerChannelSetVolume(mixer_channel_info *ch, int volume);
+int MixerChannelSetMasterVolume(mixer_channel_info *ch, int volume);
 int MixerChannelSetPanning(mixer_channel_info *ch, int panning);
 
 // Mixer function

@@ -17,6 +17,7 @@ void UMOD_Mix(int8_t *left_buffer, int8_t *right_buffer, size_t buffer_size);
 
 int UMOD_PlaySong(uint32_t index);
 int UMOD_IsPlayingSong(void);
+void UMOD_Song_VolumeSet(int volume); // 0 (0.0) - 256 (1.0)
 
 // SFX API
 // =======
@@ -42,5 +43,6 @@ typedef enum {
 
 umod_handle UMOD_SFX_Play(uint32_t index, umod_loop_type loop_type);
 int UMOD_SFX_Stop(umod_handle handle);
+void UMOD_SFX_VolumeSet(int volume); // 0 (0.0) - 256 (1.0)
 
 #endif // UMOD_UMOD_H__

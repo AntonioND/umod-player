@@ -120,7 +120,7 @@ void ModChannelReset(int channel)
     mod_ch->effect_params = -1;
     mod_ch->panning = 128; // Middle
 
-    mod_ch->ch = MixerModChannelGet(channel);
+    mod_ch->ch = MixerChannelGetFromIndex(channel);
 
     assert(mod_ch->ch != NULL);
 
@@ -131,6 +131,23 @@ void ModChannelResetAll(void)
 {
     for (int i = 0; i < MOD_CHANNELS_MAX; i++)
         ModChannelReset(i);
+}
+
+void UMOD_Song_VolumeSet(int volume)
+{
+    if (volume > 256)
+        volume = 256;
+    else if (volume < 0)
+        volume = 0;
+
+    // Refresh volume of all channels
+    for (int i = 0; i < MOD_CHANNELS_MAX; i++)
+    {
+        mod_channel_info *mod_ch = &mod_channel[i];
+        mixer_channel_info *mixer_ch = mod_ch->ch;
+
+        MixerChannelSetMasterVolume(mixer_ch, volume);
+    }
 }
 
 // Table taken from:

@@ -22,6 +22,13 @@ void UMOD_Init(uint32_t sample_rate)
     global_sample_rate = sample_rate;
 
     ModSetSampleRateConvertConstant(sample_rate);
+
+    // This will load all the pointers to the mixer channels so that the song
+    // volume can be changed.
+    ModChannelResetAll();
+    UMOD_Song_VolumeSet(256);
+
+    UMOD_SFX_VolumeSet(256);
 }
 
 uint32_t GetGlobalSampleRate(void)

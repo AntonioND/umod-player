@@ -10,81 +10,9 @@
 #include <umod/umodpack.h>
 
 #include "definitions.h"
+#include "global.h"
 #include "mixer_channel.h"
 #include "mod_channel.h"
-#include "sound_effect.h"
-
-typedef struct {
-    const void *data;
-    uint32_t    num_songs;
-    uint32_t    num_patterns;
-    uint32_t    num_instruments;
-    uint32_t   *offsets_songs;
-    uint32_t   *offsets_patterns;
-    uint32_t   *offsets_samples;
-} umod_loaded_pack;
-
-static umod_loaded_pack loaded_pack;
-
-static uint32_t global_sample_rate;
-
-void UMOD_Init(uint32_t sample_rate)
-{
-    global_sample_rate = sample_rate;
-
-    ModSetSampleRateConvertConstant(sample_rate);
-}
-
-uint32_t GetGlobalSampleRate(void)
-{
-    return global_sample_rate;
-}
-
-int UMOD_LoadPack(const void *pack)
-{
-    if (global_sample_rate == 0)
-        return -1;
-
-    const umodpack_header *header = pack;
-
-    if ((header->magic[0] != 'U') || (header->magic[1] != 'M') ||
-        (header->magic[2] != 'O') || (header->magic[3] != 'D'))
-    {
-        return -2;
-    }
-
-    loaded_pack.data = pack;
-
-    loaded_pack.num_songs = header->num_songs;
-    loaded_pack.num_patterns = header->num_patterns;
-    loaded_pack.num_instruments = header->num_instruments;
-
-    // If there are songs, it is needed to at least have one pattern
-    if ((loaded_pack.num_songs > 0) && (loaded_pack.num_patterns == 0))
-        return -3;
-
-    // Reject any file with no instruments
-    if (loaded_pack.num_instruments == 0)
-        return -4;
-
-    uint32_t *read_ptr = (uint32_t *)((uintptr_t)pack + sizeof(umodpack_header));
-    loaded_pack.offsets_songs = read_ptr;
-    read_ptr += loaded_pack.num_songs;
-    loaded_pack.offsets_patterns = read_ptr;
-    read_ptr += loaded_pack.num_patterns;
-    loaded_pack.offsets_samples = read_ptr;
-
-    return 0;
-}
-
-static umodpack_instrument *InstrumentGetPointer(int index)
-{
-    uint32_t offset = loaded_pack.offsets_samples[index];
-    uintptr_t instrument_address = (uintptr_t)loaded_pack.data;
-    instrument_address += offset;
-
-    return (umodpack_instrument *)instrument_address;
-}
 
 // ============================================================================
 //                              Song API
@@ -114,13 +42,15 @@ static song_state loaded_song;
 
 static void ReloadPatternData(void)
 {
+    umod_loaded_pack *loaded_pack = GetLoadedPack();
+
     int current_pattern = loaded_song.current_pattern;
     int pattern_index = loaded_song.pattern_indices[current_pattern];
-    uint32_t pattern_offset = loaded_pack.offsets_patterns[pattern_index];
+    uint32_t pattern_offset = loaded_pack->offsets_patterns[pattern_index];
 
     //printf("Playing pattern index %d\n", pattern_index);
 
-    uintptr_t pattern_address = (uintptr_t)loaded_pack.data + pattern_offset;
+    uintptr_t pattern_address = (uintptr_t)loaded_pack->data + pattern_offset;
 
     loaded_song.pattern_pointer = (void *)pattern_address;
 
@@ -138,6 +68,8 @@ static void SetSpeed(int speed)
 
     if (speed >= 0x20)
     {
+        uint32_t global_sample_rate = GetGlobalSampleRate();
+
         // Default is 125 BPM -> 50 Hz
         int hz = (2 * speed) / 5;
         loaded_song.samples_per_tick = global_sample_rate / hz;
@@ -151,7 +83,9 @@ static void SetSpeed(int speed)
 
 int UMOD_PlaySong(uint32_t index)
 {
-    if (index >= loaded_pack.num_songs)
+    umod_loaded_pack *loaded_pack = GetLoadedPack();
+
+    if (index >= loaded_pack->num_songs)
         return -1;
 
     if (loaded_song.playing)
@@ -172,8 +106,8 @@ int UMOD_PlaySong(uint32_t index)
 
     loaded_song.current_row = 0;
 
-    uint32_t song_offset = loaded_pack.offsets_songs[index];
-    uintptr_t song_address = (uintptr_t)loaded_pack.data + song_offset;
+    uint32_t song_offset = loaded_pack->offsets_songs[index];
+    uintptr_t song_address = (uintptr_t)loaded_pack->data + song_offset;
 
     loaded_song.length = *(uint16_t *)song_address;
     loaded_song.pattern_indices = (void *)(song_address + 2);
@@ -389,46 +323,6 @@ static void UMOD_Tick(void)
 int UMOD_IsPlayingSong(void)
 {
     return loaded_song.playing;
-}
-
-// ============================================================================
-//                              SFX API
-// ============================================================================
-
-umod_handle UMOD_SFX_Play(uint32_t index, umod_loop_type loop_type)
-{
-    if (index >= loaded_pack.num_instruments)
-        return -1;
-
-    umod_handle handle = MixerChannelAllocate();
-
-    if (handle != UMOD_HANDLE_INVALID)
-    {
-        mixer_channel_info *ch = MixerChannelGet(handle);
-
-        assert(ch != NULL);
-
-        umodpack_instrument *instrument_pointer = InstrumentGetPointer(index);
-
-        SFX_Play(ch, instrument_pointer);
-
-        if (loop_type != UMOD_LOOP_DEFAULT)
-            SFX_Loop(ch, loop_type);
-    }
-
-    return handle;
-}
-
-int UMOD_SFX_Stop(umod_handle handle)
-{
-    mixer_channel_info *ch = MixerChannelGet(handle);
-
-    if (ch == NULL)
-        return -1;
-
-    SFX_Stop(ch);
-
-    return 0;
 }
 
 // ============================================================================

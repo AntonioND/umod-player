@@ -314,10 +314,12 @@ int add_wav(const char *path, int *instrument_index)
         for (size_t i = 0; i < waveform_samples; i++)
             waveform[i] = waveform[i] - 128;
 
+        printf("  ");
         *instrument_index = instrument_add((int8_t *)waveform, waveform_samples,
                                            255, 0, // volume, finetune
                                            wav_loop_start, wav_loop_length,
                                            sample_rate);
+        printf("\n");
     }
     else if (bits_per_sample == 16)
     {
@@ -333,10 +335,12 @@ int add_wav(const char *path, int *instrument_index)
         for (size_t i = 0; i < waveform_samples; i++)
             waveform_dst[i] = waveform[i] >> 8;
 
+        printf("  ");
         *instrument_index = instrument_add(waveform_dst, waveform_samples,
                                            255, 0, // volume, finetune
                                            wav_loop_start, wav_loop_length,
                                            sample_rate);
+        printf("\n");
     }
     else
     {

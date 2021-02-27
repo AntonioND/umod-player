@@ -211,7 +211,7 @@ int add_mod(const char *path, int *song_index)
         size_t instrument_loop_point = 2 * (size_t)swap16(instrument->loop_point);
         size_t instrument_loop_length = 2 * (size_t)swap16(instrument->loop_length);
 
-        printf("    %2d: Name: '%s'\n", i, instrument_name);
+        printf("    %2d: '%-22s' ", i, instrument_name);
 
 #if 0
         if (instrument_size > 0)
@@ -224,6 +224,7 @@ int add_mod(const char *path, int *song_index)
         }
 #endif
 
+        // Loops that are shorter than 4 should be ignored
         if (instrument_loop_length < 4)
             instrument_loop_length = 0;
 
@@ -257,6 +258,8 @@ int add_mod(const char *path, int *song_index)
                                                  instrument_loop_length,
                                                  0);
         }
+
+        printf("\n");
 
         // Point to next instrument data
 

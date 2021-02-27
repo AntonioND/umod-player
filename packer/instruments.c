@@ -66,30 +66,60 @@ int instrument_add(int8_t *data, size_t size, int volume, int finetune,
     // Fix instrument
 
     if (size == 0)
+    {
+        printf("Empty");
         return -1;
+    }
 
     if (loop_start > size)
     {
         loop_start = 0;
         loop_length = 0;
-        printf("Invalid loop arguments for instrument\n");
+        printf("Invalid loop arguments for instrument: Loop disabled");
     }
 
     if ((loop_start + loop_length) > size)
     {
         loop_length = size - loop_start;
-        printf("Invalid loop length for instrument\n");
+        printf("Invalid loop length for instrument: Loop clamped");
     }
 
     // Check if this instrument is already in the list
 
-    // TODO
+    for (int index = 0; index < instruments_used; index++)
+    {
+        generic_instrument *instrument = instruments[index];
+
+        if ((instrument->size != size) || (instrument->volume != volume) ||
+            (instrument->finetune != finetune) ||
+            (instrument->loop_start != loop_start) ||
+            (instrument->loop_length != loop_length) ||
+            (instrument->frequency != frequency))
+        {
+            continue;
+        }
+
+        for (size_t i = 0; i < size; i++)
+        {
+            if (instrument->data[i] != data[i])
+                continue;
+        }
+
+        // Everything matches, don't allocate a new instrument, return index of
+        // this one.
+
+        printf("Repeated: Index %d", index);
+
+        return index;
+    }
 
     // Allocate new instrument
 
     int instrument_index = new_instrument();
     if (instrument_index < 0)
         return -1;
+
+    printf("New: Index %d", instrument_index);
 
     generic_instrument *instrument = instruments[instrument_index];
     instrument->size = size;

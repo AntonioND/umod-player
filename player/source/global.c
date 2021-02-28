@@ -28,7 +28,7 @@ void UMOD_Init(uint32_t sample_rate)
     ModChannelResetAll();
     UMOD_Song_VolumeSet(256);
 
-    UMOD_SFX_VolumeSet(256);
+    UMOD_SFX_SetMasterVolume(256);
 }
 
 uint32_t GetGlobalSampleRate(void)

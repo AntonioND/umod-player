@@ -16,7 +16,7 @@
 //                              SFX API
 // ============================================================================
 
-void UMOD_SFX_VolumeSet(int volume)
+void UMOD_SFX_SetMasterVolume(int volume)
 {
     if (volume > 256)
         volume = 256;

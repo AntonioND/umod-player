@@ -164,9 +164,9 @@ int main(void)
             UMOD_Song_VolumeSet(256);
 
         if (keys_pressed & KEY_DOWN)
-            UMOD_SFX_VolumeSet(64);
+            UMOD_SFX_SetMasterVolume(64);
         if (keys_pressed & KEY_UP)
-            UMOD_SFX_VolumeSet(256);
+            UMOD_SFX_SetMasterVolume(256);
 
         VBlankIntrWait();
     }

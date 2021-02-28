@@ -41,8 +41,10 @@ typedef enum {
     UMOD_LOOP_DISABLE = 2
 } umod_loop_type;
 
+// Set master volume for all the SFX channels. Values: 0 - 256.
+void UMOD_SFX_SetMasterVolume(int volume);
+
 umod_handle UMOD_SFX_Play(uint32_t index, umod_loop_type loop_type);
 int UMOD_SFX_Stop(umod_handle handle);
-void UMOD_SFX_VolumeSet(int volume); // 0 (0.0) - 256 (1.0)
 
 #endif // UMOD_UMOD_H__

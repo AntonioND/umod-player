@@ -173,6 +173,11 @@ int main(void)
         if (keys_pressed & KEY_RIGHT)
             UMOD_Song_Play(SONG_KAOS_OCH_DEKADENS_MOD);
 
+        if (keys_pressed & KEY_START)
+            UMOD_Song_Pause();
+        if (keys_pressed & KEY_SELECT)
+            UMOD_Song_Resume();
+
         VBlankIntrWait();
     }
 }

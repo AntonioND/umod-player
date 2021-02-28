@@ -72,6 +72,9 @@ int MixerChannelSetPanning(mixer_channel_info *ch, int panning);
 
 // Mixer function
 
-void MixerMix(int8_t *left_buffer, int8_t *right_buffer, size_t buffer_size);
+// If mix_song is 1, the song will be mixed. If not, the channels assigned to
+// the song will be skipped.
+void MixerMix(int8_t *left_buffer, int8_t *right_buffer, size_t buffer_size,
+              int mix_song);
 
 #endif // UMOD_MIXER_CHANNEL_H__

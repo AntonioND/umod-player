@@ -35,6 +35,17 @@ int UMOD_Song_Play(uint32_t index);
 // It returns 1 if there is currently a song being played, 0 otheriwse.
 int UMOD_Song_IsPlaying(void);
 
+// It returns 1 if the current song is paused, 0 otheriwse.
+int UMOD_Song_IsPaused(void);
+
+// It pauses a song if it is being played. It returns 0 on success. This
+// function fails if there is no song being played, or if it is already paused.
+int UMOD_Song_Pause(void);
+
+// It resumes a song if it is paused. It returns 0 on success. This function
+// fails if there is no paused song.
+int UMOD_Song_Resume(void);
+
 // Stops the song currently being played.
 void UMOD_Song_Stop(void);
 

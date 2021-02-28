@@ -270,14 +270,17 @@ int MixerChannelSetPanning(mixer_channel_info *ch, int panning)
 #define UNROLLED_LOOP_ITERATIONS    16
 
 ARM_CODE IWRAM_CODE
-void MixerMix(int8_t *left_buffer, int8_t *right_buffer, size_t buffer_size)
+void MixerMix(int8_t *left_buffer, int8_t *right_buffer, size_t buffer_size,
+              int mix_song)
 {
     // Get list of all active channels
 
     int active_channels = 0;
     mixer_channel_info *active_ch[MIXER_CHANNELS_MAX];
 
-    for (int channel = 0; channel < MIXER_CHANNELS_MAX; channel++)
+    int first_channel = mix_song ? 0 : MOD_CHANNELS_MAX;
+
+    for (int channel = first_channel; channel < MIXER_CHANNELS_MAX; channel++)
     {
         mixer_channel_info *ch = &mixer_channel[channel];
 

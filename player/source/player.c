@@ -19,7 +19,12 @@
 // ============================================================================
 
 typedef struct {
-    int         playing;
+
+#define STATE_STOPPED   0
+#define STATE_PAUSED    1
+#define STATE_PLAYING   2
+
+    int         state;
 
     uint8_t    *pattern_indices; // Pointer to list of pattern indices
     int         length;
@@ -83,12 +88,12 @@ static void SetSpeed(int speed)
 
 void UMOD_Song_Stop(void)
 {
-    if (loaded_song.playing == 0)
+    if (loaded_song.state == STATE_STOPPED)
         return;
 
     ModChannelResetAll();
 
-    loaded_song.playing = 0;
+    loaded_song.state = STATE_STOPPED;
 }
 
 int UMOD_Song_Play(uint32_t index)
@@ -98,11 +103,10 @@ int UMOD_Song_Play(uint32_t index)
     if (index >= loaded_pack->num_songs)
         return -1;
 
-    if (loaded_song.playing)
+    if (loaded_song.state != STATE_STOPPED)
     {
-        loaded_song.playing = 0;
+        loaded_song.state = STATE_STOPPED;
 
-        // TODO: Stop song
         ModChannelResetAll();
     }
 
@@ -138,7 +142,7 @@ int UMOD_Song_Play(uint32_t index)
         ModChannelSetEffect(c, EFFECT_TREMOLO_WAVEFORM, 0, -1);
     }
 
-    loaded_song.playing = 1;
+    loaded_song.state = STATE_PLAYING;
 
     return 0;
 }
@@ -187,7 +191,7 @@ static void UMOD_Tick(void)
 
         if (loaded_song.current_pattern >= loaded_song.length)
         {
-            loaded_song.playing = 0;
+            loaded_song.state = STATE_STOPPED;
             ModChannelResetAll();
             return;
         }
@@ -332,7 +336,38 @@ static void UMOD_Tick(void)
 
 int UMOD_Song_IsPlaying(void)
 {
-    return loaded_song.playing;
+    if (loaded_song.state == STATE_PLAYING)
+        return 1;
+
+    return 0;
+}
+
+int UMOD_Song_IsPaused(void)
+{
+    if (loaded_song.state == STATE_PAUSED)
+        return 1;
+
+    return 0;
+}
+
+int UMOD_Song_Pause(void)
+{
+    if (loaded_song.state != STATE_PLAYING)
+        return -1;
+
+    loaded_song.state = STATE_PAUSED;
+
+    return 1;
+}
+
+int UMOD_Song_Resume(void)
+{
+    if (loaded_song.state != STATE_PAUSED)
+        return -1;
+
+    loaded_song.state = STATE_PLAYING;
+
+    return 1;
 }
 
 // ============================================================================
@@ -343,9 +378,11 @@ void UMOD_Mix(int8_t *left_buffer, int8_t *right_buffer, size_t buffer_size)
 {
     while (buffer_size > 0)
     {
-        if (loaded_song.playing == 0)
+        if (loaded_song.state != STATE_PLAYING)
         {
-            MixerMix(left_buffer, right_buffer, buffer_size);
+            // If the song isn't being played, it isn't needed to call
+            // UMOD_Tick(), so just call the mixer to fill all the buffer.
+            MixerMix(left_buffer, right_buffer, buffer_size, 0);
             break;
         }
         else
@@ -360,7 +397,7 @@ void UMOD_Mix(int8_t *left_buffer, int8_t *right_buffer, size_t buffer_size)
             {
                 size_t size = loaded_song.samples_left_for_tick;
 
-                MixerMix(left_buffer, right_buffer, size);
+                MixerMix(left_buffer, right_buffer, size, 1);
                 left_buffer += size;
                 right_buffer += size;
                 buffer_size -= size;
@@ -369,7 +406,7 @@ void UMOD_Mix(int8_t *left_buffer, int8_t *right_buffer, size_t buffer_size)
             }
             else // if (buffer_size < loaded_song.samples_left_for_tick)
             {
-                MixerMix(left_buffer, right_buffer, buffer_size);
+                MixerMix(left_buffer, right_buffer, buffer_size, 1);
 
                 loaded_song.samples_left_for_tick -= buffer_size;
 

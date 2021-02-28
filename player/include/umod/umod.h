@@ -44,7 +44,20 @@ typedef enum {
 // Set master volume for all the SFX channels. Values: 0 - 256.
 void UMOD_SFX_SetMasterVolume(int volume);
 
+// Play SFX that corresponds to the specified SFX_xxx define. It returns a
+// handle that can be used to modify this effect while it is being played. In
+// the case of one-shot sounds, the handle stops being valid after the sound
+// ends.
+//
+// Note that using an invalid handle won't crash any function, but it won't
+// affect any other effect being played in the same channel.
+//
+// This function returns UMOD_HANDLE_INVALID if the SFX doesn't exist, or if
+// there are no available channels.
 umod_handle UMOD_SFX_Play(uint32_t index, umod_loop_type loop_type);
+
+// Stop playing the specified sound. Returns 0 on success. It can fail if the
+// handle is invalid or if the SFX has already finished.
 int UMOD_SFX_Stop(umod_handle handle);
 
 #endif // UMOD_UMOD_H__

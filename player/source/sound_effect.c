@@ -14,6 +14,12 @@
 
 typedef struct {
 
+    // Pointer to the mixer channel that is being used for this SFX
+    mixer_channel_info *ch;
+
+    // Pointer to the instrument being played in the channel
+    umodpack_instrument *instrument;
+
     // Handle that was given to the owner of this channel
     umod_handle handle;
 
@@ -33,54 +39,48 @@ static sfx_channel_info sfx_channel[MIXER_CHANNELS_MAX];
 // the old handle, only with the new one.
 static uint32_t handle_counter;
 
-static inline uint32_t MixerChannelGetNewCounter(void)
+static umod_handle SFX_GenerateHandle(uint32_t channel)
 {
     handle_counter++;
 
     if (handle_counter == 0)
         handle_counter++;
 
-    return handle_counter;
+    umod_handle handle = (handle_counter << 16) | channel;
+
+    return handle;
 }
 
-// Returns a handler
-static umod_handle MixerChannelAllocate(void)
+// Returns a channel number. On error, it returns -1
+static int SFX_MixerChannelAllocate(void)
 {
-    for (uint32_t i = MOD_CHANNELS_MAX; i < MIXER_CHANNELS_MAX; i++)
+    for (int i = MOD_CHANNELS_MAX; i < MIXER_CHANNELS_MAX; i++)
     {
         mixer_channel_info *ch = MixerChannelGetFromIndex(i);
 
         if (MixerChannelIsPlaying(ch))
             continue;
 
-        sfx_channel_info *sfx = &sfx_channel[i];
-
-        umod_handle handle = (MixerChannelGetNewCounter() << 16) | i;
-
-        sfx->handle = handle;
-
-        ch->left_panning = 127;
-        ch->right_panning = 128;
-        MixerChannelRefreshVolumes(ch);
-
-        return handle;
+        return i;
     }
 
     // No channel found
-    return UMOD_HANDLE_INVALID;
+    return -1;
 }
 
-mixer_channel_info *MixerChannelGet(umod_handle handle)
+static sfx_channel_info *SFX_MixerChannelGet(umod_handle handle)
 {
     uint32_t channel = handle & 0xFFFF;
 
+    // TODO: Check if channel is within range.
+
+    sfx_channel_info *sfx = &sfx_channel[channel];
+
     // If the channel has a different handler, the handle is no longer valid
-    if (sfx_channel[channel].handle != handle)
+    if (sfx->handle != handle)
         return NULL;
 
-    mixer_channel_info *ch = MixerChannelGetFromIndex(channel);
-
-    return ch;
+    return sfx;
 }
 
 // ============================================================================
@@ -109,68 +109,94 @@ umod_handle UMOD_SFX_Play(uint32_t index, umod_loop_type loop_type)
     if (index >= loaded_pack->num_instruments)
         return -1;
 
-    umod_handle handle = MixerChannelAllocate();
+    int channel = SFX_MixerChannelAllocate();
 
-    if (handle != UMOD_HANDLE_INVALID)
-    {
-        mixer_channel_info *ch = MixerChannelGet(handle);
+    if (channel == -1)
+        return -1;
 
-        assert(ch != NULL);
+    umod_handle handle = SFX_GenerateHandle(channel);
 
-        umodpack_instrument *instrument_pointer = InstrumentGetPointer(index);
+    if (handle == UMOD_HANDLE_INVALID)
+        return -1;
 
-        uint64_t sample_rate = (uint64_t)GetGlobalSampleRate();
+    sfx_channel_info *sfx = &sfx_channel[channel];
 
-        MixerChannelSetInstrument(ch, instrument_pointer);
+    // Save handle to be able to verify that the sound being played in channel X
+    // is the sound the handle corresponds to.
 
-        // 32.32 / 64.0 = 32.32
-        uint64_t period = (sample_rate << 32) / instrument_pointer->frequency;
+    sfx->handle = handle;
 
-        MixerChannelSetNotePeriod(ch, period); // 32.32
+    // Save pointer to mixer channel for easier access.
 
-        MixerChannelSetVolume(ch, 255);
+    mixer_channel_info *ch = MixerChannelGetFromIndex(channel);
+    assert(ch != NULL);
 
-        MixerChannelStart(ch);
+    sfx->ch = ch;
 
-        if (loop_type != UMOD_LOOP_DEFAULT)
-            MixerChannelSetLoop(ch, loop_type);
-    }
+    // Save the original instrument in order to be able to return to the
+    // default values (frequency, etc)
+
+    umodpack_instrument *instrument_pointer = InstrumentGetPointer(index);
+    sfx_channel[channel].instrument = instrument_pointer;
+
+    MixerChannelSetInstrument(ch, instrument_pointer);
+
+    // Calculate note period
+
+    uint64_t sample_rate = (uint64_t)GetGlobalSampleRate();
+
+    // 32.32 / 64.0 = 32.32
+    uint64_t period = (sample_rate << 32) / instrument_pointer->frequency;
+
+    MixerChannelSetNotePeriod(ch, period); // 32.32
+
+    // Set remaining values of the mixer channel
+
+    MixerChannelSetVolume(ch, 255);
+    MixerChannelSetPanning(ch, 128);
+
+    MixerChannelStart(ch);
+
+    // Override loop values if needed
+
+    if (loop_type != UMOD_LOOP_DEFAULT)
+        MixerChannelSetLoop(ch, loop_type);
 
     return handle;
 }
 
 int UMOD_SFX_SetVolume(umod_handle handle, int volume)
 {
-    mixer_channel_info *ch = MixerChannelGet(handle);
+    sfx_channel_info *sfx = SFX_MixerChannelGet(handle);
 
-    if (ch == NULL)
+    if (sfx == NULL)
         return -1;
 
-    MixerChannelSetVolume(ch, volume);
+    MixerChannelSetVolume(sfx->ch, volume);
 
     return 0;
 }
 
 int UMOD_SFX_SetPanning(umod_handle handle, int panning)
 {
-    mixer_channel_info *ch = MixerChannelGet(handle);
+    sfx_channel_info *sfx = SFX_MixerChannelGet(handle);
 
-    if (ch == NULL)
+    if (sfx == NULL)
         return -1;
 
-    MixerChannelSetPanning(ch, panning);
+    MixerChannelSetPanning(sfx->ch, panning);
 
     return 0;
 }
 
 int UMOD_SFX_Stop(umod_handle handle)
 {
-    mixer_channel_info *ch = MixerChannelGet(handle);
+    sfx_channel_info *sfx = SFX_MixerChannelGet(handle);
 
-    if (ch == NULL)
+    if (sfx == NULL)
         return -1;
 
-    MixerChannelStop(ch);
+    MixerChannelStop(sfx->ch);
 
     return 0;
 }

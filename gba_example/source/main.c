@@ -168,6 +168,11 @@ int main(void)
         if (keys_pressed & KEY_UP)
             UMOD_SFX_SetMasterVolume(256);
 
+        if (keys_pressed & KEY_LEFT)
+            UMOD_Song_Stop();
+        if (keys_pressed & KEY_RIGHT)
+            UMOD_Song_Play(SONG_KAOS_OCH_DEKADENS_MOD);
+
         VBlankIntrWait();
     }
 }

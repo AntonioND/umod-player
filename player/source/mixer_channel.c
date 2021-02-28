@@ -18,7 +18,8 @@ static mixer_channel_info mixer_channel[MIXER_CHANNELS_MAX];
 
 mixer_channel_info *MixerChannelGetFromIndex(uint32_t index)
 {
-    assert(index < MIXER_CHANNELS_MAX);
+    if (index >= MIXER_CHANNELS_MAX)
+        return NULL;
 
     mixer_channel_info *ch = &mixer_channel[index];
 

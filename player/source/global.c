@@ -26,7 +26,7 @@ void UMOD_Init(uint32_t sample_rate)
     // This will load all the pointers to the mixer channels so that the song
     // volume can be changed.
     ModChannelResetAll();
-    UMOD_Song_VolumeSet(256);
+    UMOD_Song_SetMasterVolume(256);
 
     UMOD_SFX_SetMasterVolume(256);
 }

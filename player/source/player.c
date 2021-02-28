@@ -81,7 +81,7 @@ static void SetSpeed(int speed)
     }
 }
 
-int UMOD_PlaySong(uint32_t index)
+int UMOD_Song_Play(uint32_t index)
 {
     umod_loaded_pack *loaded_pack = GetLoadedPack();
 
@@ -320,7 +320,7 @@ static void UMOD_Tick(void)
     }
 }
 
-int UMOD_IsPlayingSong(void)
+int UMOD_Song_IsPlaying(void)
 {
     return loaded_song.playing;
 }

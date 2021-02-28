@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
         goto cleanup;
     }
 
-    UMOD_PlaySong(0);
+    UMOD_Song_Play(0);
 
     WAV_FileStart(argv[2], SAMPLE_RATE);
     if (!WAV_FileIsOpen())
@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
 
     int frames = 0;
 
-    while (UMOD_IsPlayingSong())
+    while (UMOD_Song_IsPlaying())
     {
 #define SIZE (SAMPLE_RATE / 60)
         int8_t left[SIZE], right[SIZE];

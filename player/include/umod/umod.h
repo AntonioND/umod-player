@@ -15,9 +15,15 @@ void UMOD_Mix(int8_t *left_buffer, int8_t *right_buffer, size_t buffer_size);
 // Song API
 // ========
 
-int UMOD_PlaySong(uint32_t index);
-int UMOD_IsPlayingSong(void);
-void UMOD_Song_VolumeSet(int volume); // 0 (0.0) - 256 (1.0)
+// Set master volume for all the song channels. Values: 0 - 256.
+void UMOD_Song_SetMasterVolume(int volume);
+
+// Plays the specified song (MOD_xxx defines, etc). It stops the currently
+// played song if any. It returns 0 on success.
+int UMOD_Song_Play(uint32_t index);
+
+// It returns 1 if there is currently a song being played, 0 otheriwse.
+int UMOD_Song_IsPlaying(void);
 
 // SFX API
 // =======

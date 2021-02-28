@@ -125,7 +125,7 @@ int main(void)
 
     Audio_DMA_Setup();
 
-    UMOD_PlaySong(SONG_KAOS_OCH_DEKADENS_MOD);
+    UMOD_Song_Play(SONG_KAOS_OCH_DEKADENS_MOD);
 
     umod_handle helicopter_handle = UMOD_HANDLE_INVALID;
 
@@ -159,9 +159,9 @@ int main(void)
         }
 
         if (keys_pressed & KEY_L)
-            UMOD_Song_VolumeSet(64);
+            UMOD_Song_SetMasterVolume(64);
         if (keys_pressed & KEY_R)
-            UMOD_Song_VolumeSet(256);
+            UMOD_Song_SetMasterVolume(256);
 
         if (keys_pressed & KEY_DOWN)
             UMOD_SFX_SetMasterVolume(64);

@@ -133,7 +133,7 @@ void ModChannelResetAll(void)
         ModChannelReset(i);
 }
 
-void UMOD_Song_VolumeSet(int volume)
+void UMOD_Song_SetMasterVolume(int volume)
 {
     if (volume > 256)
         volume = 256;

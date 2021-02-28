@@ -35,6 +35,9 @@ int UMOD_Song_Play(uint32_t index);
 // It returns 1 if there is currently a song being played, 0 otheriwse.
 int UMOD_Song_IsPlaying(void);
 
+// Stops the song currently being played.
+void UMOD_Song_Stop(void);
+
 // SFX API
 // =======
 

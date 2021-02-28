@@ -81,6 +81,16 @@ static void SetSpeed(int speed)
     }
 }
 
+void UMOD_Song_Stop(void)
+{
+    if (loaded_song.playing == 0)
+        return;
+
+    ModChannelResetAll();
+
+    loaded_song.playing = 0;
+}
+
 int UMOD_Song_Play(uint32_t index)
 {
     umod_loaded_pack *loaded_pack = GetLoadedPack();

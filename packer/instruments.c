@@ -99,11 +99,19 @@ int instrument_add(int8_t *data, size_t size, int volume, int finetune,
             continue;
         }
 
+        int different = 0;
+
         for (size_t i = 0; i < size; i++)
         {
             if (instrument->data[i] != data[i])
-                continue;
+            {
+                different = 1;
+                break;
+            }
         }
+
+        if (different)
+            continue;
 
         // Everything matches, don't allocate a new instrument, return index of
         // this one.

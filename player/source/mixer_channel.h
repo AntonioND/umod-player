@@ -46,15 +46,9 @@ typedef struct {
         uint32_t    position_inc_per_sample; // 20.12
     } sample;
 
-    umod_handle handle; // Handle that was given to the owner of this channel
 } mixer_channel_info;
 
-// Handles API (for SFXs)
-
-uint32_t MixerChannelAllocate(void);
-mixer_channel_info *MixerChannelGet(uint32_t handle);
-
-// Direct access API
+// Direct access functions
 
 mixer_channel_info *MixerChannelGetFromIndex(uint32_t index);
 void MixerChannelRefreshVolumes(mixer_channel_info *ch);

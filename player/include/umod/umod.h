@@ -8,8 +8,18 @@
 #include <stddef.h>
 #include <stdint.h>
 
+// Global functions
+// ================
+
+// Initialize player and set up the desired sample rate.
 void UMOD_Init(uint32_t sample_rate);
+
+// Load a pack file to be used from this point. When switching between pack
+// files, make sure that there are no songs or SFXs being played. It returns 0
+// on success.
 int UMOD_LoadPack(const void *pack);
+
+// Fills the specified buffers with audio data to be sent to the output device.
 void UMOD_Mix(int8_t *left_buffer, int8_t *right_buffer, size_t buffer_size);
 
 // Song API

@@ -56,6 +56,15 @@ void UMOD_SFX_SetMasterVolume(int volume);
 // there are no available channels.
 umod_handle UMOD_SFX_Play(uint32_t index, umod_loop_type loop_type);
 
+// Set volume for the specified effect. Values: 0 - 256. Returns 0 on success.
+// It can fail if the handle is invalid or if the SFX has already finished.
+int UMOD_SFX_SetVolume(umod_handle handle, int volume);
+
+// Set panning for the specified effect. Values: 0 (left) - 255 (right). Returns
+// 0 on success. It can fail if the handle is invalid or if the SFX has already
+// finished.
+int UMOD_SFX_SetPanning(umod_handle handle, int panning);
+
 // Stop playing the specified sound. Returns 0 on success. It can fail if the
 // handle is invalid or if the SFX has already finished.
 int UMOD_SFX_Stop(umod_handle handle);

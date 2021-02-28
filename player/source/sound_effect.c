@@ -68,6 +68,30 @@ umod_handle UMOD_SFX_Play(uint32_t index, umod_loop_type loop_type)
     return handle;
 }
 
+int UMOD_SFX_SetVolume(umod_handle handle, int volume)
+{
+    mixer_channel_info *ch = MixerChannelGet(handle);
+
+    if (ch == NULL)
+        return -1;
+
+    MixerChannelSetVolume(ch, volume);
+
+    return 0;
+}
+
+int UMOD_SFX_SetPanning(umod_handle handle, int panning)
+{
+    mixer_channel_info *ch = MixerChannelGet(handle);
+
+    if (ch == NULL)
+        return -1;
+
+    MixerChannelSetPanning(ch, panning);
+
+    return 0;
+}
+
 int UMOD_SFX_Stop(umod_handle handle)
 {
     mixer_channel_info *ch = MixerChannelGet(handle);

@@ -95,6 +95,10 @@ int UMOD_SFX_SetVolume(umod_handle handle, int volume);
 // finished.
 int UMOD_SFX_SetPanning(umod_handle handle, int panning);
 
+// Set new playback frequency of the SFX. Multiplier in fixed point format
+// 16.16. It returns 0 on success.
+int UMOD_SFX_SetFrequencyMultiplier(umod_handle handle, uint32_t multiplier);
+
 // Stop playing the specified sound. Returns 0 on success. It can fail if the
 // handle is invalid or if the SFX has already finished.
 int UMOD_SFX_Stop(umod_handle handle);

@@ -189,6 +189,26 @@ int UMOD_SFX_SetPanning(umod_handle handle, int panning)
     return 0;
 }
 
+// Multiplier in format 16.16
+int UMOD_SFX_SetFrequencyMultiplier(umod_handle handle, uint32_t multiplier)
+{
+    sfx_channel_info *sfx = SFX_MixerChannelGet(handle);
+
+    if (sfx == NULL)
+        return -1;
+
+    uint32_t frequency = (multiplier * (uint64_t)sfx->instrument->frequency) >> 16;
+
+    uint64_t sample_rate = (uint64_t)GetGlobalSampleRate();
+
+    // 32.32 / 64.0 = 32.32
+    uint64_t period = (sample_rate << 32) / frequency;
+
+    MixerChannelSetNotePeriodPorta(sfx->ch, period); // 32.32
+
+    return 0;
+}
+
 int UMOD_SFX_Stop(umod_handle handle)
 {
     sfx_channel_info *sfx = SFX_MixerChannelGet(handle);

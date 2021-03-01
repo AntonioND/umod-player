@@ -94,6 +94,9 @@ static int SFX_MixerChannelAllocate(void)
 
 static sfx_channel_info *SFX_MixerChannelGet(umod_handle handle)
 {
+    if (handle == UMOD_HANDLE_INVALID)
+        return NULL;
+
     uint32_t channel = handle & 0xFFFF;
 
     // TODO: Check if channel is within range.
@@ -247,6 +250,18 @@ int UMOD_SFX_Release(umod_handle handle)
     sfx->released = 1;
 
     return 0;
+}
+
+int UMOD_SFX_IsPlaying(umod_handle handle)
+{
+    sfx_channel_info *sfx = SFX_MixerChannelGet(handle);
+
+    if (sfx == NULL)
+        return 0;
+
+    assert(sfx->ch);
+
+    return MixerChannelIsPlaying(sfx->ch);
 }
 
 int UMOD_SFX_Stop(umod_handle handle)

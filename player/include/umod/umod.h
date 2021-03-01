@@ -105,6 +105,9 @@ int UMOD_SFX_SetFrequencyMultiplier(umod_handle handle, uint32_t multiplier);
 // success.
 int UMOD_SFX_Release(umod_handle handle);
 
+// Returns 1 if the specified SFX is being played, 0 otherwise.
+int UMOD_SFX_IsPlaying(umod_handle handle);
+
 // Stop playing the specified sound. Returns 0 on success. It can fail if the
 // handle is invalid or if the SFX has already finished.
 int UMOD_SFX_Stop(umod_handle handle);

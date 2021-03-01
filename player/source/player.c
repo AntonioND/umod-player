@@ -26,13 +26,13 @@ typedef struct {
 
     int         state;
 
-    uint8_t    *pattern_indices; // Pointer to list of pattern indices
+    uint16_t   *pattern_indices; // Pointer to list of pattern indices
     int         length;
     int         current_pattern; // From 0 to song length
 
-    void       *pattern_pointer;
-    int         pattern_channels;
-    int         pattern_rows;
+    umodpack_pattern   *pattern_pointer;
+    int                 pattern_channels;
+    int                 pattern_rows;
 
     size_t      samples_per_tick; // Increment tick every X samples
     size_t      samples_left_for_tick;
@@ -57,9 +57,9 @@ static void ReloadPatternData(void)
 
     uintptr_t pattern_address = (uintptr_t)loaded_pack->data + pattern_offset;
 
-    loaded_song.pattern_pointer = (void *)pattern_address;
+    umodpack_pattern *pattern = (umodpack_pattern *)pattern_address;
 
-    umodpack_pattern *pattern = loaded_song.pattern_pointer;
+    loaded_song.pattern_pointer = pattern;
 
     loaded_song.pattern_channels = pattern->channels;
     loaded_song.pattern_rows = pattern->rows;
@@ -123,8 +123,10 @@ int UMOD_Song_Play(uint32_t index)
     uint32_t song_offset = loaded_pack->offsets_songs[index];
     uintptr_t song_address = (uintptr_t)loaded_pack->data + song_offset;
 
-    loaded_song.length = *(uint16_t *)song_address;
-    loaded_song.pattern_indices = (void *)(song_address + 2);
+    umodpack_song *song = (umodpack_song *)song_address;
+
+    loaded_song.length = song->num_of_patterns;
+    loaded_song.pattern_indices = &(song->pattern_index[0]);
 
     loaded_song.current_pattern = 0;
 

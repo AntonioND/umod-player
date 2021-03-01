@@ -18,8 +18,8 @@ typedef struct {
 } umodpack_header;
 
 typedef struct {
-    char        num_of_patterns;
-    uint8_t     pattern_index[];
+    uint16_t    num_of_patterns;
+    uint16_t    pattern_index[];
 } umodpack_song;
 
 typedef struct {

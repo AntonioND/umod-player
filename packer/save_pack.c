@@ -2,6 +2,7 @@
 //
 // Copyright (c) 2021 Antonio Niño Díaz
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -51,6 +52,7 @@ int save_pack(const char *path)
     // Patterns
 
     long pattern_offsets = ftell(f);
+    assert(num_patterns <= UINT16_MAX);
     for (uint32_t i = 0; i < num_patterns; i++)
         fwrite(&empty, sizeof(empty), 1, f);
 
@@ -75,7 +77,7 @@ int save_pack(const char *path)
 
         for (size_t p = 0; p < length; p++)
         {
-            uint8_t val = data[p];
+            uint16_t val = data[p];
             fwrite(&val, sizeof(val), 1, f);
         }
 

@@ -130,21 +130,26 @@ int save_pack(const char *path)
 
                 if (instrument != -1)
                 {
+                    assert(instrument <= UINT8_MAX);
                     value = instrument;
                     fwrite(&value, sizeof(value), 1, f);
                 }
                 if (note != -1)
                 {
+                    assert(note <= UINT8_MAX);
                     value = note;
                     fwrite(&value, sizeof(value), 1, f);
                 }
                 if (volume != -1)
                 {
+                    assert(volume <= UINT8_MAX);
                     value = volume;
                     fwrite(&value, sizeof(value), 1, f);
                 }
                 if (effect != -1)
                 {
+                    assert(effect <= UINT8_MAX);
+                    assert(effect_params <= UINT8_MAX);
                     value = effect;
                     fwrite(&value, sizeof(value), 1, f);
                     value = effect_params;

@@ -48,7 +48,7 @@ typedef struct {
 #define STEP_HAS_EFFECT         (1 << 3)
 
 // Note: 0 = C0, 1 = C#0, etc
-// Instrument: TODO
+// Instrument: Index of instrument inside the pack file (0 - 255)
 // Volume: 0 - 255
 // Effect: Effect type (1 byte) | Effect parameters (1 byte)
 

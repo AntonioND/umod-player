@@ -99,6 +99,12 @@ int UMOD_SFX_SetPanning(umod_handle handle, int panning);
 // 16.16. It returns 0 on success.
 int UMOD_SFX_SetFrequencyMultiplier(umod_handle handle, uint32_t multiplier);
 
+// Release the channel playing this SFX. When a channel is released, it means it
+// is available for another SFX. If a new SFX is requested and no other channels
+// are free, the SFXs in the released channels will be used. It returns 0 on
+// success.
+int UMOD_SFX_Release(umod_handle handle);
+
 // Stop playing the specified sound. Returns 0 on success. It can fail if the
 // handle is invalid or if the SFX has already finished.
 int UMOD_SFX_Stop(umod_handle handle);

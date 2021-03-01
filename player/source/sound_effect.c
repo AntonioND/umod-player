@@ -23,6 +23,11 @@ typedef struct {
     // Handle that was given to the owner of this channel
     umod_handle handle;
 
+    // Set to 1 when the effect is released: Flagged as low priority and
+    // available if any SFX channel is needed and all other channels are being
+    // used.
+    int released;
+
 } sfx_channel_info;
 
 // TODO: Use only MIXER_SFX_CHANNELS
@@ -54,12 +59,31 @@ static umod_handle SFX_GenerateHandle(uint32_t channel)
 // Returns a channel number. On error, it returns -1
 static int SFX_MixerChannelAllocate(void)
 {
+    // First, look for any free channel.
+
     for (int i = MOD_CHANNELS_MAX; i < MIXER_CHANNELS_MAX; i++)
     {
         mixer_channel_info *ch = MixerChannelGetFromIndex(i);
 
         if (MixerChannelIsPlaying(ch))
             continue;
+
+        return i;
+    }
+
+    // Now, as all channels are being used, check if any of them has been
+    // released.
+
+    for (int i = MOD_CHANNELS_MAX; i < MIXER_CHANNELS_MAX; i++)
+    {
+        sfx_channel_info *sfx = &sfx_channel[i];
+
+        if (sfx->released == 0)
+            continue;
+
+        mixer_channel_info *ch = MixerChannelGetFromIndex(i);
+
+        MixerChannelStop(ch);
 
         return i;
     }
@@ -125,6 +149,10 @@ umod_handle UMOD_SFX_Play(uint32_t index, umod_loop_type loop_type)
     // is the sound the handle corresponds to.
 
     sfx->handle = handle;
+
+    // Set as high priority.
+
+    sfx->released = 0;
 
     // Save pointer to mixer channel for easier access.
 
@@ -205,6 +233,18 @@ int UMOD_SFX_SetFrequencyMultiplier(umod_handle handle, uint32_t multiplier)
     uint64_t period = (sample_rate << 32) / frequency;
 
     MixerChannelSetNotePeriodPorta(sfx->ch, period); // 32.32
+
+    return 0;
+}
+
+int UMOD_SFX_Release(umod_handle handle)
+{
+    sfx_channel_info *sfx = SFX_MixerChannelGet(handle);
+
+    if (sfx == NULL)
+        return -1;
+
+    sfx->released = 1;
 
     return 0;
 }

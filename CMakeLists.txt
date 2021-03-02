@@ -26,6 +26,13 @@ macro(search_source_files dir var)
     file(GLOB ${var} CONFIGURE_DEPENDS ${dir}/*.c ${dir}/*.h)
 endmacro()
 
+# Macro that searches all the audio files in the specified directory in 'dir'
+# and saves them in 'var'
+
+macro(search_audio_files dir var)
+    file(GLOB ${var} CONFIGURE_DEPENDS ${dir}/*.mod ${dir}/*.wav)
+endmacro()
+
 # Add components
 
 add_subdirectory(player)

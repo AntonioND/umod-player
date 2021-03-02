@@ -8,3 +8,4 @@ add_custom_target(generate_references)
 include(cmake/test.cmake)
 
 add_subdirectory(mod)
+add_subdirectory(sfx)

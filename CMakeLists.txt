@@ -31,6 +31,7 @@ endmacro()
 add_subdirectory(player)
 add_subdirectory(packer)
 add_subdirectory(renderer)
+add_subdirectory(utils)
 
 # If this project is being used as a module within another project, remove all
 # testing from the build.

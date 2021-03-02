@@ -8,4 +8,4 @@ search_source_files(. FILES_SOURCE)
 
 target_sources(umod_renderer PRIVATE ${FILES_SOURCE})
 
-target_link_libraries(umod_renderer umod_player)
+target_link_libraries(umod_renderer umod_player utils)

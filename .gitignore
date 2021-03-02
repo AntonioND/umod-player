@@ -1,8 +1,13 @@
-# CMake build folder
+# CMake build folder and GBA makefile build folder
 build/
 
 # Library archives
 *.a
+
+# GBA ROMs and saved data files
+*.gba
+*.elf
+*.sav
 
 # Vim swap files
 *.swp

@@ -217,6 +217,11 @@ int UMOD_SFX_SetVolume(umod_handle handle, int volume)
     if (sfx == NULL)
         return -1;
 
+    assert(sfx->ch);
+
+    if (MixerChannelIsPlaying(sfx->ch) == 0)
+        return -1;
+
     MixerChannelSetVolume(sfx->ch, volume);
 
     return 0;
@@ -227,6 +232,11 @@ int UMOD_SFX_SetPanning(umod_handle handle, int panning)
     sfx_channel_info *sfx = SFX_MixerChannelGet(handle);
 
     if (sfx == NULL)
+        return -1;
+
+    assert(sfx->ch);
+
+    if (MixerChannelIsPlaying(sfx->ch) == 0)
         return -1;
 
     MixerChannelSetPanning(sfx->ch, panning);
@@ -243,6 +253,11 @@ int UMOD_SFX_SetFrequencyMultiplier(umod_handle handle, uint32_t multiplier)
     sfx_channel_info *sfx = SFX_MixerChannelGet(handle);
 
     if (sfx == NULL)
+        return -1;
+
+    assert(sfx->ch);
+
+    if (MixerChannelIsPlaying(sfx->ch) == 0)
         return -1;
 
     uint32_t frequency = (multiplier * (uint64_t)sfx->instrument->frequency) >> 16;
@@ -262,6 +277,11 @@ int UMOD_SFX_Release(umod_handle handle)
     sfx_channel_info *sfx = SFX_MixerChannelGet(handle);
 
     if (sfx == NULL)
+        return -1;
+
+    assert(sfx->ch);
+
+    if (MixerChannelIsPlaying(sfx->ch) == 0)
         return -1;
 
     sfx->released = 1;
@@ -286,6 +306,11 @@ int UMOD_SFX_Stop(umod_handle handle)
     sfx_channel_info *sfx = SFX_MixerChannelGet(handle);
 
     if (sfx == NULL)
+        return -1;
+
+    assert(sfx->ch);
+
+    if (MixerChannelIsPlaying(sfx->ch) == 0)
         return -1;
 
     MixerChannelStop(sfx->ch);

@@ -25,6 +25,8 @@ void UMOD_Mix(int8_t *left_buffer, int8_t *right_buffer, size_t buffer_size);
 // Song API
 // ========
 
+#define UMOD_SONG_CHANNELS      (8)
+
 // Set master volume for all the song channels. Values: 0 - 256.
 void UMOD_Song_SetMasterVolume(int volume);
 
@@ -51,6 +53,8 @@ void UMOD_Song_Stop(void);
 
 // SFX API
 // =======
+
+#define UMOD_SFX_CHANNELS       (4)
 
 #define UMOD_HANDLE_INVALID     0
 

@@ -54,7 +54,7 @@ typedef struct {
     mixer_channel_info     *ch;
 } mod_channel_info;
 
-static mod_channel_info mod_channel[MOD_CHANNELS_MAX];
+static mod_channel_info mod_channel[UMOD_SONG_CHANNELS];
 
 // Taken from FMODDOC.TXT
 static int16_t vibrato_tremolo_wave_sine[64] = {
@@ -109,7 +109,7 @@ static int16_t vibrato_tremolo_wave_random[64] = {
 
 void ModChannelReset(int channel)
 {
-    assert(channel < MOD_CHANNELS_MAX);
+    assert(channel < UMOD_SONG_CHANNELS);
 
     mod_channel_info *mod_ch = &mod_channel[channel];
 
@@ -129,7 +129,7 @@ void ModChannelReset(int channel)
 
 void ModChannelResetAll(void)
 {
-    for (int i = 0; i < MOD_CHANNELS_MAX; i++)
+    for (int i = 0; i < UMOD_SONG_CHANNELS; i++)
         ModChannelReset(i);
 }
 
@@ -141,7 +141,7 @@ void UMOD_Song_SetMasterVolume(int volume)
         volume = 0;
 
     // Refresh volume of all channels
-    for (int i = 0; i < MOD_CHANNELS_MAX; i++)
+    for (int i = 0; i < UMOD_SONG_CHANNELS; i++)
     {
         mod_channel_info *mod_ch = &mod_channel[i];
         mixer_channel_info *mixer_ch = mod_ch->ch;
@@ -260,7 +260,7 @@ static uint64_t ModGetSampleTickPeriodFromAmigaPeriod(uint32_t amiga_period)
 
 void ModChannelSetNote(int channel, int note)
 {
-    assert(channel < MOD_CHANNELS_MAX);
+    assert(channel < UMOD_SONG_CHANNELS);
 
     mod_channel_info *mod_ch = &mod_channel[channel];
 
@@ -284,7 +284,7 @@ void ModChannelSetNote(int channel, int note)
 
 void ModChannelSetVolume(int channel, int volume)
 {
-    assert(channel < MOD_CHANNELS_MAX);
+    assert(channel < UMOD_SONG_CHANNELS);
 
     mod_channel_info *mod_ch = &mod_channel[channel];
 
@@ -297,7 +297,7 @@ void ModChannelSetVolume(int channel, int volume)
 
 void ModChannelSetInstrument(int channel, umodpack_instrument *instrument_pointer)
 {
-    assert(channel < MOD_CHANNELS_MAX);
+    assert(channel < UMOD_SONG_CHANNELS);
 
     mod_channel_info *mod_ch = &mod_channel[channel];
 
@@ -311,7 +311,7 @@ void ModChannelSetInstrument(int channel, umodpack_instrument *instrument_pointe
 void ModChannelSetEffectDelayNote(int channel, int effect_params, int note,
                                   int volume, umodpack_instrument *instrument)
 {
-    assert(channel < MOD_CHANNELS_MAX);
+    assert(channel < UMOD_SONG_CHANNELS);
 
     mod_channel_info *mod_ch = &mod_channel[channel];
 
@@ -324,7 +324,7 @@ void ModChannelSetEffectDelayNote(int channel, int effect_params, int note,
 
 void ModChannelSetEffect(int channel, int effect, int effect_params, int note)
 {
-    assert(channel < MOD_CHANNELS_MAX);
+    assert(channel < UMOD_SONG_CHANNELS);
 
     mod_channel_info *mod_ch = &mod_channel[channel];
 
@@ -440,7 +440,7 @@ void ModChannelSetEffect(int channel, int effect, int effect_params, int note)
 // Update effects for Ticks == 0
 void ModChannelUpdateAllTick_T0(void)
 {
-    for (size_t c = 0; c < MOD_CHANNELS_MAX; c++)
+    for (size_t c = 0; c < UMOD_SONG_CHANNELS; c++)
     {
         mod_channel_info *mod_ch = &mod_channel[c];
 
@@ -583,7 +583,7 @@ void ModChannelUpdateAllTick_T0(void)
 // Update effects for Ticks > 0
 void ModChannelUpdateAllTick_TN(int tick_number)
 {
-    for (size_t c = 0; c < MOD_CHANNELS_MAX; c++)
+    for (size_t c = 0; c < UMOD_SONG_CHANNELS; c++)
     {
         mod_channel_info *mod_ch = &mod_channel[c];
 

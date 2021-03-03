@@ -216,7 +216,7 @@ void MixerMix(int8_t *left_buffer, int8_t *right_buffer, size_t buffer_size,
     int active_channels = 0;
     mixer_channel_info *active_ch[MIXER_CHANNELS_MAX];
 
-    int first_channel = mix_song ? 0 : MOD_CHANNELS_MAX;
+    int first_channel = mix_song ? 0 : UMOD_SONG_CHANNELS;
 
     for (int channel = first_channel; channel < MIXER_CHANNELS_MAX; channel++)
     {

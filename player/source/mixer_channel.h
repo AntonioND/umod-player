@@ -13,8 +13,7 @@
 
 #include "mod_channel.h"
 
-#define MIXER_SFX_CHANNELS      (4)
-#define MIXER_CHANNELS_MAX      (MOD_CHANNELS_MAX + MIXER_SFX_CHANNELS)
+#define MIXER_CHANNELS_MAX      (UMOD_SONG_CHANNELS + UMOD_SFX_CHANNELS)
 
 typedef struct {
     int master_volume;

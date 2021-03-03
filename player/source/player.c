@@ -134,7 +134,7 @@ int UMOD_Song_Play(uint32_t index)
 
     ModChannelResetAll();
 
-    for (int c = 0; c < MOD_CHANNELS_MAX; c++)
+    for (int c = 0; c < UMOD_SONG_CHANNELS; c++)
     {
         // Reset panning
         ModChannelSetEffect(c, EFFECT_SET_PANNING, 128, -1);

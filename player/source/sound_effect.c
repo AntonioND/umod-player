@@ -61,7 +61,7 @@ static int SFX_MixerChannelAllocate(void)
 {
     // First, look for any free channel.
 
-    for (int i = MOD_CHANNELS_MAX; i < MIXER_CHANNELS_MAX; i++)
+    for (int i = UMOD_SONG_CHANNELS; i < MIXER_CHANNELS_MAX; i++)
     {
         mixer_channel_info *ch = MixerChannelGetFromIndex(i);
 
@@ -74,7 +74,7 @@ static int SFX_MixerChannelAllocate(void)
     // Now, as all channels are being used, check if any of them has been
     // released.
 
-    for (int i = MOD_CHANNELS_MAX; i < MIXER_CHANNELS_MAX; i++)
+    for (int i = UMOD_SONG_CHANNELS; i < MIXER_CHANNELS_MAX; i++)
     {
         sfx_channel_info *sfx = &sfx_channel[i];
 
@@ -122,7 +122,7 @@ void UMOD_SFX_SetMasterVolume(int volume)
         volume = 0;
 
     // Refresh volume of all channels
-    for (int i = MOD_CHANNELS_MAX; i < MIXER_CHANNELS_MAX; i++)
+    for (int i = UMOD_SONG_CHANNELS; i < MIXER_CHANNELS_MAX; i++)
     {
         mixer_channel_info *mixer_ch = MixerChannelGetFromIndex(i);
         MixerChannelSetMasterVolume(mixer_ch, volume);

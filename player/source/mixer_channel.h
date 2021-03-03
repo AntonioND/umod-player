@@ -59,7 +59,8 @@ int MixerChannelSetSampleOffset(mixer_channel_info *ch, uint32_t offset);
 int MixerChannelSetNotePeriod(mixer_channel_info *ch, uint64_t period); // 32.32
 int MixerChannelSetNotePeriodPorta(mixer_channel_info *ch, uint64_t period); // 32.32
 int MixerChannelSetInstrument(mixer_channel_info *ch, umodpack_instrument *instrument_pointer);
-int MixerChannelSetLoop(mixer_channel_info *ch, umod_loop_type loop_type);
+int MixerChannelSetLoop(mixer_channel_info *ch, umod_loop_type loop_type,
+                        size_t loop_start, size_t loop_end);
 int MixerChannelSetVolume(mixer_channel_info *ch, int volume);
 int MixerChannelSetMasterVolume(mixer_channel_info *ch, int volume);
 int MixerChannelSetPanning(mixer_channel_info *ch, int panning);

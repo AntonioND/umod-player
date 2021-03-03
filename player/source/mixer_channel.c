@@ -143,27 +143,22 @@ int MixerChannelSetInstrument(mixer_channel_info *ch, umodpack_instrument *instr
     return 0;
 }
 
-int MixerChannelSetLoop(mixer_channel_info *ch, umod_loop_type loop_type)
+int MixerChannelSetLoop(mixer_channel_info *ch, umod_loop_type loop_type,
+                        size_t loop_start, size_t loop_end)
 {
     assert(ch != NULL);
 
-    // For this it is needed to have a pointer to the original instrument struct
-    // inside the pack file.
-    assert(loop_type != UMOD_LOOP_DISABLE);
+    // The caller of this function should get the default values and pass them
+    // to this function.
+    assert(loop_type != UMOD_LOOP_DEFAULT);
 
     if (loop_type == UMOD_LOOP_ENABLE)
     {
-        // Only set loop information if the instrument didn't already have
-        // loop information. In case there wasn't information, loop the whole
-        // waveform.
-        if (ch->sample.loop_start == ch->sample.loop_end)
-        {
-            ch->play_state = STATE_LOOP;
-            ch->sample.loop_start = 0;
-            ch->sample.loop_end = ch->sample.size;
-        }
+        ch->play_state = STATE_LOOP;
+        ch->sample.loop_start = loop_start << 12;
+        ch->sample.loop_end = loop_end << 12;
     }
-    else // if (loop_type == UMOD_LOOP_DISABLE)
+    else
     {
         ch->play_state = STATE_PLAY;
         ch->sample.loop_start = 0;

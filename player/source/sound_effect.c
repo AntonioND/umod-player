@@ -190,8 +190,22 @@ umod_handle UMOD_SFX_Play(uint32_t index, umod_loop_type loop_type)
 
     // Override loop values if needed
 
-    if (loop_type != UMOD_LOOP_DEFAULT)
-        MixerChannelSetLoop(ch, loop_type);
+    if (loop_type == UMOD_LOOP_DISABLE)
+    {
+        MixerChannelSetLoop(ch, UMOD_LOOP_DISABLE, 0, 0);
+    }
+    else if (loop_type == UMOD_LOOP_ENABLE)
+    {
+        // If the original instrument didn't have loop information, loop
+        // everything. If the original instrument had loop information, this
+        // isn't needed, the mixer has already been given the information when
+        // assigning the instrument.
+        if (instrument_pointer->loop_start == instrument_pointer->loop_end)
+        {
+            MixerChannelSetLoop(ch, UMOD_LOOP_ENABLE,
+                                0, instrument_pointer->size);
+        }
+    }
 
     return handle;
 }

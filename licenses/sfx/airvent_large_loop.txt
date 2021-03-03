@@ -1,0 +1,7 @@
+Name:    Airvent Loop
+Author:  Longor
+License: CC0-1.0
+
+https://opengameart.org/content/airvent-loop
+
+Note: This file has been modified to be a 8-bit 1-channel WAV and add loop information.

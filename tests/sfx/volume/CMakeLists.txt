@@ -2,6 +2,4 @@
 #
 # Copyright (c) 2021 Antonio Niño Díaz
 
-add_subdirectory(basic)
-add_subdirectory(loops)
-add_subdirectory(volume)
+test_sfx_wav()

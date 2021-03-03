@@ -38,6 +38,8 @@ void generate_ms(int ms)
 
 int main(int argc, char *argv[])
 {
+    int rc = -1;
+
     if (argc != 2)
     {
         printf("Invalid number of arguments\n");
@@ -68,17 +70,60 @@ int main(int argc, char *argv[])
     if (!WAV_FileIsOpen())
         goto cleanup;
 
-    UMOD_SFX_Play(SFX_LASER2_1_WAV, UMOD_LOOP_DEFAULT);
+    umod_handle handle = UMOD_HANDLE_INVALID;
+
+    // Non-looping SFX
+
+    handle = UMOD_SFX_Play(SFX_LASER2_1_WAV, UMOD_LOOP_DEFAULT);
+
+    generate_ms(300);
+
+    if (UMOD_SFX_IsPlaying(handle) != 1)
+    {
+        printf("Line %d: Check failed\n", __LINE__);
+        goto cleanup;
+    }
+
+    generate_ms(1700);
+
+    if (UMOD_SFX_IsPlaying(handle) != 0)
+    {
+        printf("Line %d: Check failed\n", __LINE__);
+        goto cleanup;
+    }
+
+    // Looping SFX
+
+    handle = UMOD_SFX_Play(SFX_HELICOPTER_WAV, UMOD_LOOP_ENABLE);
 
     generate_ms(2000);
 
-    UMOD_SFX_Play(SFX_HELICOPTER_WAV, UMOD_LOOP_ENABLE);
+    if (UMOD_SFX_IsPlaying(handle) != 1)
+    {
+        printf("Line %d: Check failed\n", __LINE__);
+        goto cleanup;
+    }
 
-    generate_ms(4000);
+    generate_ms(2000);
+
+    if (UMOD_SFX_IsPlaying(handle) != 1)
+    {
+        printf("Line %d: Check failed\n", __LINE__);
+        goto cleanup;
+    }
+
+    UMOD_SFX_Stop(handle);
+
+    if (UMOD_SFX_IsPlaying(handle) != 0)
+    {
+        printf("Line %d: Check failed\n", __LINE__);
+        goto cleanup;
+    }
 
     WAV_FileEnd();
 
+    rc = 0;
 cleanup:
     free(pack_buffer);
-    return 0;
+    return rc;
 }

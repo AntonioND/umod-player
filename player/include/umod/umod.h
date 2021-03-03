@@ -75,7 +75,8 @@ typedef enum {
     UMOD_LOOP_DISABLE = 2
 } umod_loop_type;
 
-// Set master volume for all the SFX channels. Values: 0 - 256.
+// Set master volume for all the SFX channels. Values: 0 - 256 (it is clamped if
+// it's outside of this range).
 void UMOD_SFX_SetMasterVolume(int volume);
 
 // Play SFX that corresponds to the specified SFX_xxx define. It returns a
@@ -90,8 +91,9 @@ void UMOD_SFX_SetMasterVolume(int volume);
 // there are no available channels.
 umod_handle UMOD_SFX_Play(uint32_t index, umod_loop_type loop_type);
 
-// Set volume for the specified effect. Values: 0 - 256. Returns 0 on success.
-// It can fail if the handle is invalid or if the SFX has already finished.
+// Set volume for the specified effect. Values: 0 - 255 (it is clamped if it's
+// outside this range). Returns 0 on success. It can fail if the handle is
+// invalid or if the SFX has already finished.
 int UMOD_SFX_SetVolume(umod_handle handle, int volume);
 
 // Set panning for the specified effect. Values: 0 (left) - 255 (right). Returns

@@ -222,6 +222,11 @@ int UMOD_SFX_SetVolume(umod_handle handle, int volume)
     if (MixerChannelIsPlaying(sfx->ch) == 0)
         return -1;
 
+    if (volume > 255)
+        volume = 255;
+    else if (volume < 0)
+        volume = 0;
+
     MixerChannelSetVolume(sfx->ch, volume);
 
     return 0;
@@ -233,6 +238,11 @@ int UMOD_SFX_SetPanning(umod_handle handle, int panning)
 
     if (sfx == NULL)
         return -1;
+
+    if (panning > 255)
+        panning = 255;
+    else if (panning < 0)
+        panning = 0;
 
     assert(sfx->ch);
 

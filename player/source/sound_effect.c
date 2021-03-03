@@ -134,17 +134,17 @@ umod_handle UMOD_SFX_Play(uint32_t index, umod_loop_type loop_type)
     umod_loaded_pack *loaded_pack = GetLoadedPack();
 
     if (index >= loaded_pack->num_instruments)
-        return -1;
+        return UMOD_HANDLE_INVALID;
 
     int channel = SFX_MixerChannelAllocate();
 
     if (channel == -1)
-        return -1;
+        return UMOD_HANDLE_INVALID;
 
     umod_handle handle = SFX_GenerateHandle(channel);
 
     if (handle == UMOD_HANDLE_INVALID)
-        return -1;
+        return UMOD_HANDLE_INVALID;
 
     sfx_channel_info *sfx = &sfx_channel[channel];
 

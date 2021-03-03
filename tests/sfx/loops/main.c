@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
     if (pack_size == 0)
         goto cleanup;
 
-    // Play music until the song ends, while saving it to a WAV
+    // Initialize library
 
     UMOD_Init(SAMPLE_RATE);
 

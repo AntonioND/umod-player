@@ -15,7 +15,8 @@ working, it is easy to optimize it and be relatively sure that nothing has been
 broken.
 
 Note that, at the moment, the only possible output from this library is a buffer
-of samples. There is a WAV file renderer that is used for the regression tests.
+of samples. There is a WAV file renderer that is used for the regression tests,
+and a GBA example that shows how to integrate the player in a GBA project.
 
 This is not ready to be used in real projects yet.
 
@@ -82,10 +83,13 @@ All files that aren't source code are licensed under the **Creative Commons
 Attribution 4.0 International** (``SPDX-License-Identifier: CC-BY-4.0``). In
 practice, this covers all the test files in the **test** directory.
 
-The folder **tests/songs** is exempt from this license, as they are songs found
-online. Each song has a corresponding information file in the **licenses/songs**
-folder of the repository. It links to the website they were downloaded from, the
-author, and the license.
+There are exceptions. Any song found online has its corresponding license
+information in folders **licenses/sfx** or **licenses/songs**. It links to the
+website they were downloaded from, the author, and the license.
+
+If there isn't a corresponding license file it's because the file has been
+created as part of this project. In that case, it is licensed under the
+**CC-BY-4.0** license.
 
 6. Acknowledgements
 -------------------
@@ -99,5 +103,6 @@ author, and the license.
 - Vicki Pfau (endrift) for mGBA.
 - The Mod Archive for an endless collection of songs.
 - Nightbeat, for some of the songs I've used to test this player with.
+- Open Game Art, for some of the sound effects used for testing this player.
 
 .. _devkitPro: https://devkitpro.org/

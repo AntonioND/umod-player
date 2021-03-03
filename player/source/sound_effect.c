@@ -237,6 +237,9 @@ int UMOD_SFX_SetPanning(umod_handle handle, int panning)
 // Multiplier in format 16.16
 int UMOD_SFX_SetFrequencyMultiplier(umod_handle handle, uint32_t multiplier)
 {
+    if (multiplier == 0)
+        return -1;
+
     sfx_channel_info *sfx = SFX_MixerChannelGet(handle);
 
     if (sfx == NULL)

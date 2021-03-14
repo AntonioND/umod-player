@@ -167,7 +167,7 @@ int add_mod(const char *path, int *song_index)
 
     printf("  Pattern list:\n");
 
-    uint8_t max_pattern_index = 0;
+    unsigned int max_pattern_index = 0;
 
     for (int i = 0; i < header->song_length; i++)
     {
@@ -186,7 +186,7 @@ int add_mod(const char *path, int *song_index)
         if (index > max_pattern_index)
             max_pattern_index = index;
     }
-    printf("  Number of patterns: %" PRIu8 "\n", max_pattern_index + 1);
+    printf("  Number of patterns: %u\n", max_pattern_index + 1);
 
     uint8_t *pattern_data = (uint8_t *)header;
     pattern_data += sizeof(mod_header);
@@ -268,7 +268,7 @@ int add_mod(const char *path, int *song_index)
 
     // Save pattern data
 
-    for (int i = 0; i <= max_pattern_index; i++)
+    for (unsigned int i = 0; i <= max_pattern_index; i++)
     {
         pattern_index[i] = pattern_add(channels, MOD_ROWS);
 

@@ -266,7 +266,8 @@ void MixerMix(int8_t *left_buffer, int8_t *right_buffer, size_t buffer_size,
             // than the number of channels. 4 seems to be a good number to keep the
             // volume up.
 
-            static_assert(MIXER_CHANNELS_MAX == (8 + 4));
+            static_assert(MIXER_CHANNELS_MAX == (8 + 4),
+                          "Unexpected number of channels");
             total_left >>= 2 + 8 + 8;  // 4 * max volume * max panning
             total_right >>= 2 + 8 + 8; // 4 * max volume * max panning
 

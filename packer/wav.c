@@ -155,7 +155,7 @@ int add_wav(const char *path, int *instrument_index)
         uint32_t subchunk_id = ((uint32_t *)subchunk)[0];
         uint32_t subchunk_size = ((uint32_t *)subchunk)[1];
 
-        printf("  Subchunk at offset %lu (%" PRIu32 " bytes) [%c%c%c%c]\n",
+        printf("  Subchunk at offset %" PRIuPTR " (%" PRIu32 " bytes) [%c%c%c%c]\n",
                offset, subchunk_size,
                subchunk_id & 0xFF,
                (subchunk_id >> 8) & 0xFF,

@@ -1,5 +1,5 @@
-UMOD Player
-===========
+UMOD Player v0.1.0
+==================
 
 1. Introduction
 ---------------

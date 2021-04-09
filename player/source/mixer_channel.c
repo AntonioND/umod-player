@@ -240,10 +240,16 @@ void MixerMix(int8_t *left_buffer, int8_t *right_buffer, size_t buffer_size,
 
     while (buffer_size >= UNROLLED_LOOP_ITERATIONS)
     {
-        for (int c = 0; c < UNROLLED_LOOP_ITERATIONS; c++)
+        for (int c = 0; c < UNROLLED_LOOP_ITERATIONS / 4; c++)
         {
-            int32_t total_left = 0;
-            int32_t total_right = 0;
+            int32_t total_left1 = 0;
+            int32_t total_right1 = 0;
+            int32_t total_left2 = 0;
+            int32_t total_right2 = 0;
+            int32_t total_left3 = 0;
+            int32_t total_right3 = 0;
+            int32_t total_left4 = 0;
+            int32_t total_right4 = 0;
 
             for (int i = 0; i < active_channels; i++)
             {
@@ -253,8 +259,26 @@ void MixerMix(int8_t *left_buffer, int8_t *right_buffer, size_t buffer_size,
                 int32_t value = ch->sample.pointer[ch->sample.position >> 12];
                 ch->sample.position += ch->sample.position_inc_per_sample;
 
-                total_left += value * ch->left_volume;
-                total_right += value * ch->right_volume;
+                total_left1 += value * ch->left_volume;
+                total_right1 += value * ch->right_volume;
+
+                value = ch->sample.pointer[ch->sample.position >> 12];
+                ch->sample.position += ch->sample.position_inc_per_sample;
+
+                total_left2 += value * ch->left_volume;
+                total_right2 += value * ch->right_volume;
+
+                value = ch->sample.pointer[ch->sample.position >> 12];
+                ch->sample.position += ch->sample.position_inc_per_sample;
+
+                total_left3 += value * ch->left_volume;
+                total_right3 += value * ch->right_volume;
+
+                value = ch->sample.pointer[ch->sample.position >> 12];
+                ch->sample.position += ch->sample.position_inc_per_sample;
+
+                total_left4 += value * ch->left_volume;
+                total_right4 += value * ch->right_volume;
             }
 
             // Total = sample * number of channels * volume * panning
@@ -268,20 +292,60 @@ void MixerMix(int8_t *left_buffer, int8_t *right_buffer, size_t buffer_size,
 
             static_assert(MIXER_CHANNELS_MAX == (8 + 4),
                           "Unexpected number of channels");
-            total_left >>= 2 + 8 + 8;  // 4 * max volume * max panning
-            total_right >>= 2 + 8 + 8; // 4 * max volume * max panning
+            total_left1 >>= 2 + 8 + 8;  // 4 * max volume * max panning
+            total_right1 >>= 2 + 8 + 8; // 4 * max volume * max panning
+            total_left2 >>= 2 + 8 + 8;  // 4 * max volume * max panning
+            total_right2 >>= 2 + 8 + 8; // 4 * max volume * max panning
+            total_left3 >>= 2 + 8 + 8;  // 4 * max volume * max panning
+            total_right3 >>= 2 + 8 + 8; // 4 * max volume * max panning
+            total_left4 >>= 2 + 8 + 8;  // 4 * max volume * max panning
+            total_right4 >>= 2 + 8 + 8; // 4 * max volume * max panning
 
-            if (total_left < -128)
-                total_left = -128;
-            if (total_right < -128)
-                total_right = -128;
-            if (total_left > 127)
-                total_left = 127;
-            if (total_right > 127)
-                total_right = 127;
+            if (total_left1 < -128)
+                total_left1 = -128;
+            if (total_right1 < -128)
+                total_right1 = -128;
+            if (total_left1 > 127)
+                total_left1 = 127;
+            if (total_right1 > 127)
+                total_right1 = 127;
 
-            *left_buffer++ = total_left;
-            *right_buffer++ = total_right;
+            if (total_left2 < -128)
+                total_left2 = -128;
+            if (total_right2 < -128)
+                total_right2 = -128;
+            if (total_left2 > 127)
+                total_left2 = 127;
+            if (total_right2 > 127)
+                total_right2 = 127;
+
+            if (total_left3 < -128)
+                total_left3 = -128;
+            if (total_right3 < -128)
+                total_right3 = -128;
+            if (total_left3 > 127)
+                total_left3 = 127;
+            if (total_right3 > 127)
+                total_right3 = 127;
+
+            if (total_left4 < -128)
+                total_left4 = -128;
+            if (total_right4 < -128)
+                total_right4 = -128;
+            if (total_left4 > 127)
+                total_left4 = 127;
+            if (total_right4 > 127)
+                total_right4 = 127;
+
+            *left_buffer++ = total_left1;
+            *left_buffer++ = total_left2;
+            *left_buffer++ = total_left3;
+            *left_buffer++ = total_left4;
+
+            *right_buffer++ = total_right1;
+            *right_buffer++ = total_right2;
+            *right_buffer++ = total_right3;
+            *right_buffer++ = total_right4;
         }
 
         buffer_size -= UNROLLED_LOOP_ITERATIONS;

@@ -39,10 +39,10 @@ typedef struct {
     int32_t     porta_to_note_target_amiga_period;
     int         porta_to_note_speed;
 
-    int16_t    *vibrato_wave_table;
+    const int16_t   *vibrato_wave_table;
     int         vibrato_retrigger;
 
-    int16_t    *tremolo_wave_table;
+    const int16_t   *tremolo_wave_table;
     int         tremolo_retrigger;
 
     int                     delayed_note;
@@ -57,7 +57,7 @@ typedef struct {
 static mod_channel_info mod_channel[UMOD_SONG_CHANNELS];
 
 // Taken from FMODDOC.TXT
-static int16_t vibrato_tremolo_wave_sine[64] = {
+static const int16_t vibrato_tremolo_wave_sine[64] = {
        0,   24,   49,   74,   97,  120,  141,  161,
      180,  197,  212,  224,  235,  244,  250,  253,
      255,  253,  250,  244,  235,  224,  212,  197,
@@ -70,7 +70,7 @@ static int16_t vibrato_tremolo_wave_sine[64] = {
 
 // for (int i = 0; i < 64; i++)
 //     printf("%d, ", 256 - (i + 1) * 8);
-static int16_t vibrato_tremolo_wave_ramp[64] = {
+static const int16_t vibrato_tremolo_wave_ramp[64] = {
      248,  240,  232,  224,  216,  208,  200,  192,
      184,  176,  168,  160,  152,  144,  136,  128,
      120,  112,  104,   96,   88,   80,   72,   64,
@@ -83,7 +83,7 @@ static int16_t vibrato_tremolo_wave_ramp[64] = {
 
 // for (int i = 0; i < 64; i++)
 //     printf("%d, ", i < 32 ? 255 : -255);
-static int16_t vibrato_tremolo_wave_square[64] = {
+static const int16_t vibrato_tremolo_wave_square[64] = {
      255,  255,  255,  255,  255,  255,  255,  255,
      255,  255,  255,  255,  255,  255,  255,  255,
      255,  255,  255,  255,  255,  255,  255,  255,
@@ -96,7 +96,7 @@ static int16_t vibrato_tremolo_wave_square[64] = {
 
 // for (int i = 0; i < 64; i++)
 //     printf("%d, ", (rand() & 511) - 256);
-static int16_t vibrato_tremolo_wave_random[64] = {
+static const int16_t vibrato_tremolo_wave_random[64] = {
      103,  198, -151, -141, -175,   -1, -182,  -20,
       41,  -51,  -70,  171,  242,   -5,  227,   70,
     -132,  -62, -172,  248,   27,  232,  231,  141,
@@ -154,7 +154,7 @@ void UMOD_Song_SetMasterVolume(int volume)
 //
 //   https://github.com/OpenMPT/openmpt/blob/818b2c101d2256a430291ddcbcb47edd7e762308/soundlib/Tables.cpp#L272-L290
 //
-static uint16_t finetuned_period_table[16][12] = {
+static const uint16_t finetuned_period_table[16][12] = {
     // Values for octave 0. Divide by 2 to get octave 1, by 4 to get octave 2...
     //  C    C#    D     D#    E     F     F#    G     G#    A     A#    B
     { 1712, 1616, 1524, 1440, 1356, 1280, 1208, 1140, 1076, 1016,  960, 907 },

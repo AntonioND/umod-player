@@ -70,7 +70,7 @@ int save_pack(const char *path)
 
         const int *data;
         size_t length;
-        song_get(0, &data, &length);
+        song_get(i, &data, &length);
 
         uint16_t length_ = length;
         fwrite(&length_, sizeof(length_), 1, f);

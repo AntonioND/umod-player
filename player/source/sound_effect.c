@@ -327,3 +327,16 @@ int UMOD_SFX_Stop(umod_handle handle)
 
     return 0;
 }
+
+void UMOD_SFX_StopAll(void)
+{
+    for (int i = UMOD_SONG_CHANNELS; i < MIXER_CHANNELS_MAX; i++)
+    {
+        sfx_channel_info *sfx = &sfx_channel[i];
+
+        assert(sfx->ch);
+
+        if (MixerChannelIsPlaying(sfx->ch))
+            MixerChannelStop(sfx->ch);
+    }
+}

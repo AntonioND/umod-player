@@ -118,4 +118,7 @@ int UMOD_SFX_IsPlaying(umod_handle handle);
 // handle is invalid or if the SFX has already finished.
 int UMOD_SFX_Stop(umod_handle handle);
 
+// Stop playing all active sound effects.
+void UMOD_SFX_StopAll(void);
+
 #endif // UMOD_UMOD_H__

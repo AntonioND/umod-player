@@ -130,8 +130,10 @@ int save_pack(const char *path)
 
                 if (instrument != -1)
                 {
-                    assert(instrument <= UINT8_MAX);
-                    value = instrument;
+                    assert(instrument <= UINT16_MAX);
+                    value = instrument & 0xFF;
+                    fwrite(&value, sizeof(value), 1, f);
+                    value = instrument >> 8;
                     fwrite(&value, sizeof(value), 1, f);
                 }
                 if (note != -1)

@@ -220,7 +220,10 @@ static void UMOD_Tick(void)
         int effect_params = -1;
 
         if (flags & STEP_HAS_INSTRUMENT)
+        {
             instrument = *loaded_song.pattern_position++;
+            instrument |= ((uint16_t)*loaded_song.pattern_position++) << 8;
+        }
 
         if (flags & STEP_HAS_NOTE)
             note = *loaded_song.pattern_position++;

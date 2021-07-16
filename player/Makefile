@@ -20,7 +20,7 @@ ARCH	:=	-mthumb -mthumb-interwork
 #---------------------------------------------------------------------------------
 CFLAGS	:=	-g -O3 -Wall -Wno-switch -Wno-multichar \
 		-ffunction-sections -fdata-sections \
-		$(ARCH) $(INCLUDE) -D__GBA__
+		$(ARCH) $(INCLUDE) -D__GBA__ -DNDEBUG
 ASFLAGS	:=	-g -Wa,--warn $(ARCH) -D__GBA__
 
 #---------------------------------------------------------------------------------

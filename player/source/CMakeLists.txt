@@ -2,6 +2,7 @@
 #
 # Copyright (c) 2021 Antonio Niño Díaz
 
-include(${CMAKE_SOURCE_DIR}/cmake/toolchain_host.cmake)
-
-test_sfx_wav()
+if(BUILD_GBA)
+    add_subdirectory(gba)
+endif()
+add_subdirectory(host)

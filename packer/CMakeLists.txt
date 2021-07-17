@@ -2,6 +2,8 @@
 #
 # Copyright (c) 2021 Antonio Niño Díaz
 
+include(${CMAKE_SOURCE_DIR}/cmake/toolchain_host.cmake)
+
 add_executable(umod_packer)
 
 search_source_files(. FILES_SOURCE)

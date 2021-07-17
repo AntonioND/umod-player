@@ -15,10 +15,6 @@ set(C_STANDARD_REQUIRED ON)
 get_directory_property(PROJECT_HAS_PARENT PARENT_DIRECTORY)
 set(PROJECT_IS_SUBMODULE ${PROJECT_HAS_PARENT})
 
-# Global compiler-specific options
-
-include(cmake/compiler_flags.cmake)
-
 # Macro that searches all the source files in the specified directory in 'dir'
 # and saves them in 'var'
 
@@ -32,6 +28,10 @@ endmacro()
 macro(search_audio_files dir var)
     file(GLOB ${var} CONFIGURE_DEPENDS ${dir}/*.mod ${dir}/*.wav)
 endmacro()
+
+# Global build options
+
+option(BUILD_GBA "Build GBA binaries in addition to PC binaries" OFF)
 
 # Add components
 

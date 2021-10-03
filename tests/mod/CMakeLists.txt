@@ -2,7 +2,7 @@
 #
 # Copyright (c) 2021 Antonio Niño Díaz
 
-include(${CMAKE_SOURCE_DIR}/cmake/toolchain_host.cmake)
+toolchain_sdl2()
 
 # Test effect 0xx, including 000, which is a "no effect" effect. Also, test
 # arpeggios when the song speed is too fast and the second note of the arpeggio

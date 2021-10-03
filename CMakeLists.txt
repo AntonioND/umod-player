@@ -33,6 +33,18 @@ endmacro()
 
 option(BUILD_GBA "Build GBA binaries in addition to PC binaries" OFF)
 
+# Toolchain selection macros
+
+get_filename_component(UMOD_PLAYER_PATH "." ABSOLUTE)
+
+macro(toolchain_gba)
+    include(${UMOD_PLAYER_PATH}/cmake/toolchain_gba.cmake)
+endmacro()
+
+macro(toolchain_sdl2)
+    include(${UMOD_PLAYER_PATH}/cmake/toolchain_sdl2.cmake)
+endmacro()
+
 # Add components
 
 add_subdirectory(player)

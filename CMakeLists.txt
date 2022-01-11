@@ -33,6 +33,8 @@ endmacro()
 
 option(BUILD_GBA "Build GBA binaries in addition to PC binaries" OFF)
 
+option(USE_DEVKITARM "Use devkitARM to build GBA binaries" ON)
+
 # Toolchain selection macros
 
 get_filename_component(UMOD_PLAYER_PATH "." ABSOLUTE)

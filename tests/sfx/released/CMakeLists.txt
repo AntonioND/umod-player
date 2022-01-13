@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: MIT
 #
-# Copyright (c) 2021 Antonio Niño Díaz
+# Copyright (c) 2021-2022 Antonio Niño Díaz
 
-toolchain_sdl2()
+umod_toolchain_sdl2()
 
 test_sfx_wav()

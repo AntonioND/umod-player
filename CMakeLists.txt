@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: MIT
 #
-# Copyright (c) 2021 Antonio Niño Díaz
+# Copyright (c) 2021-2022 Antonio Niño Díaz
 
 cmake_minimum_required(VERSION 3.13)
 project(umod)
@@ -39,13 +39,8 @@ option(USE_DEVKITARM "Use devkitARM to build GBA binaries" ON)
 
 get_filename_component(UMOD_PLAYER_PATH "." ABSOLUTE)
 
-macro(toolchain_gba)
-    include(${UMOD_PLAYER_PATH}/cmake/toolchain_gba.cmake)
-endmacro()
-
-macro(toolchain_sdl2)
-    include(${UMOD_PLAYER_PATH}/cmake/toolchain_sdl2.cmake)
-endmacro()
+include(cmake/toolchain_gba.cmake)
+include(cmake/toolchain_sdl2.cmake)
 
 # Add components
 

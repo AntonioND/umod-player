@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: MIT
 #
-# Copyright (c) 2021 Antonio Niño Díaz
+# Copyright (c) 2021-2022 Antonio Niño Díaz
 
-toolchain_gba()
+umod_toolchain_gba()
 
 # Define library target
 # ---------------------

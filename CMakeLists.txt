@@ -37,8 +37,6 @@ option(USE_DEVKITARM "Use devkitARM to build GBA binaries" ON)
 
 # Toolchain selection macros
 
-get_filename_component(UMOD_PLAYER_PATH "." ABSOLUTE)
-
 include(cmake/toolchain_gba.cmake)
 include(cmake/toolchain_sdl2.cmake)
 

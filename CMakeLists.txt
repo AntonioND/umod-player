@@ -37,6 +37,7 @@ option(USE_DEVKITARM "Use devkitARM to build GBA binaries" ON)
 
 # Toolchain selection macros
 
+include(cmake/compiler_flags.cmake)
 include(cmake/toolchain_gba.cmake)
 include(cmake/toolchain_sdl2.cmake)
 

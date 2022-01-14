@@ -5,6 +5,8 @@
 umod_toolchain_sdl2()
 
 add_executable(umod_packer)
+compiler_flags_sdl2(umod_packer)
+linker_flags_sdl2(umod_packer)
 
 search_source_files(. FILES_SOURCE)
 

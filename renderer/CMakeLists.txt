@@ -5,10 +5,10 @@
 umod_toolchain_sdl2()
 
 add_executable(umod_renderer)
-compiler_flags_sdl2(umod_renderer)
-linker_flags_sdl2(umod_renderer)
+umod_compiler_flags_sdl2(umod_renderer)
+umod_linker_flags_sdl2(umod_renderer)
 
-search_source_files(. FILES_SOURCE)
+umod_search_source_files(. FILES_SOURCE)
 
 target_sources(umod_renderer PRIVATE ${FILES_SOURCE})
 

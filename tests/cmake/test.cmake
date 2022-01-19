@@ -70,10 +70,10 @@ function(test_sfx_wav)
     # Build source files
 
     add_executable(${BINARY_NAME})
-    compiler_flags_sdl2(${BINARY_NAME})
-    linker_flags_sdl2(${BINARY_NAME})
+    umod_compiler_flags_sdl2(${BINARY_NAME})
+    umod_linker_flags_sdl2(${BINARY_NAME})
 
-    search_source_files(. FILES_SOURCE)
+    umod_search_source_files(. FILES_SOURCE)
 
     target_sources(${BINARY_NAME} PRIVATE ${FILES_SOURCE})
 

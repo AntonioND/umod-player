@@ -18,7 +18,7 @@ set(PROJECT_IS_SUBMODULE ${PROJECT_HAS_PARENT})
 # Macro that searches all the source files in the specified directory in 'dir'
 # and saves them in 'var'
 
-macro(search_source_files dir var)
+macro(umod_search_source_files dir var)
     file(GLOB ${var} CONFIGURE_DEPENDS ${dir}/*.c ${dir}/*.h)
 endmacro()
 

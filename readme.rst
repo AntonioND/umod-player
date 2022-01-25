@@ -23,19 +23,28 @@ This is not ready to be used in real projects yet.
 2. Dependencies
 ---------------
 
-To generate GBA ROMs:
-
-- `devkitPro`_ (devkitARM and libgba)
-
-To generate PC executables:
+To generate PC executables and libraries:
 
 - GCC, Clang, MSVC or another compiler supported by CMake.
 - CMake 3.15 or later
+
+To build the GBA example ROM:
+
+- `devkitPro`_ (devkitARM and libgba)
 
 You need to install devkitPro following the instructions in this link, then
 follow the instructions in the sections below.
 
 https://devkitpro.org/wiki/Getting_Started
+
+To build the library for GBA you need either `devkitPro`_ or any
+``gcc-arm-none-eabi`` toolchain. For example, you can get it from your package
+manager, or from `Arm's GNU toolchain downloads website`_. In Ubuntu you can
+just do:
+
+.. code:: bash
+
+    sudo apt install gcc-arm-none-eabi
 
 3. Build PC library and examples on Linux
 -----------------------------------------
@@ -48,9 +57,26 @@ to verify it's working:
 
     mkdir build ; cd build ; cmake ..
     make -j`nproc`
-    ctest
+    ctest -DBUILD_GBA=OFF
 
-4. Build GBA example
+4. Build GBA library
+--------------------
+
+To build it using **devkitPro**:
+
+.. code:: bash
+
+    mkdir build ; cd build ; cmake ..
+    make -j`nproc`
+
+To build it without using **devkitPro**:
+
+.. code:: bash
+
+    mkdir build ; cd build ; cmake .. -DUSE_DEVKITPRO=OFF
+    make -j`nproc`
+
+5. Build GBA example
 --------------------
 
 Follow the instructions to build the PC tools as explained above.  Make sure
@@ -70,7 +96,7 @@ Go to folder **player** and run ``make``. Go to folder **gba_example** and run
 
 Note that the code of this example is just a proof of concept.
 
-5. Licenses
+6. Licenses
 -----------
 
 All licenses used in this repository have a copy in the **licenses** folder.
@@ -91,7 +117,7 @@ If there isn't a corresponding license file it's because the file has been
 created as part of this project. In that case, it is licensed under the
 **CC-BY-4.0** license.
 
-6. Acknowledgements
+7. Acknowledgements
 -------------------
 
 - Brett Paterson (FireLight) for FMODDOC.TXT
@@ -105,4 +131,5 @@ created as part of this project. In that case, it is licensed under the
 - Nightbeat, for some of the songs I've used to test this player with.
 - Open Game Art, for some of the sound effects used for testing this player.
 
+.. _Arm's GNU toolchain downloads website: https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads
 .. _devkitPro: https://devkitpro.org/

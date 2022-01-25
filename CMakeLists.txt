@@ -41,6 +41,23 @@ include(cmake/compiler_flags.cmake)
 include(cmake/toolchain_gba.cmake)
 include(cmake/toolchain_sdl2.cmake)
 
+# Look for an ARM toolchain. If this library is included by a parent project,
+# check if the path has already been specified.
+
+if(NOT "${BUILD_GBA}" STREQUAL OFF)
+    if("${ARM_GCC_PATH}" STREQUAL "")
+        message(STATUS "umod-player: GBA toolchain not specified")
+        umod_search_toolchain_gba(BUILD_GBA)
+    else()
+        message(STATUS "umod-player: GBA toolchain has been specified")
+        set(BUILD_GBA ON)
+    endif()
+endif()
+
+if(BUILD_GBA)
+    message(STATUS "umod-player: GBA toolchain: ${ARM_GCC_PATH}")
+endif()
+
 # Add components
 
 add_subdirectory(player)

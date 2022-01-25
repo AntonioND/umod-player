@@ -76,6 +76,9 @@ To build it without using **devkitPro**:
     mkdir build ; cd build ; cmake .. -DUSE_DEVKITPRO=OFF
     make -j`nproc`
 
+To override the autodetected location of the cross compiler, you can add
+``-DARM_GCC_PATH=/path/to/folder/`` to the ``cmake`` command.
+
 5. Build GBA example
 --------------------
 

@@ -82,7 +82,14 @@ To override the autodetected location of the cross compiler, you can add
 5. Build GBA example
 --------------------
 
-Follow the instructions to build the PC tools as explained above.  Make sure
+This example is meant to be built using **devkitARM** and **libgba**. Both of
+them are distributed as part of **devkitPro**. If you want to see an example
+that doesn't use anything from **devkitPro**, check the `ugba-template`_
+repository.
+
+If you have installed **devkitPro**, follow the instructions below.
+
+Follow the instructions to build the PC tools as explained above. Make sure
 that the name of the folder is **build**, and it is next to the folder
 **gba_example**, in the root of the repository.
 
@@ -136,3 +143,4 @@ created as part of this project. In that case, it is licensed under the
 
 .. _Arm's GNU toolchain downloads website: https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads
 .. _devkitPro: https://devkitpro.org/
+.. _ugba-template: https://github.com/AntonioND/ugba-template
